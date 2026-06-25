@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AurisAI — Gestão Inteligente para Clínicas de Audiologia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --polar: #F7F9FC;
+    --navy: #0D2B4E;
+    --cyan: #00A8CC;
+    --coral: #FF6B35;
+    --ice: #E8F3F8;
+    --steel: #2D6A8C;
+    --navy-light: #1A3F66;
+    --text-muted: #5A7A8C;
+    --border: #D0E4EE;
+    --white: #ffffff;
+    --font-display: 'Outfit', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); color: var(--navy); background: var(--polar); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(247,249,252,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 64px;
+  }
+  .logo { font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; color: var(--navy); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--cyan); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 18px; height: 18px; }
+  .logo span { color: var(--cyan); }
+  .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+  .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--steel); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--navy); }
+  .nav-cta { display: flex; gap: 12px; align-items: center; }
+  .btn-ghost { font-family: var(--font-display); font-size: 0.875rem; font-weight: 500; color: var(--navy); background: none; border: none; cursor: pointer; text-decoration: none; padding: 8px 16px; border-radius: 8px; transition: background .2s; }
+  .btn-ghost:hover { background: var(--ice); }
+  .btn-primary { font-family: var(--font-display); font-size: 0.875rem; font-weight: 600; background: var(--coral); color: var(--white); border: none; cursor: pointer; padding: 10px 20px; border-radius: 8px; text-decoration: none; transition: background .2s, transform .15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: #E85A24; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { padding-top: 120px; padding-bottom: 80px; padding-left: 5%; padding-right: 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; max-width: 1200px; margin: 0 auto; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ice); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px 6px 8px; font-size: 0.8rem; font-weight: 500; color: var(--steel); margin-bottom: 24px; }
+  .badge-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; flex-shrink: 0; }
+  .hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; color: var(--navy); margin-bottom: 20px; }
+  .hero h1 em { font-style: normal; color: var(--cyan); }
+  .hero p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
+  .hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 28px; }
+
+  .btn-coral { font-family: var(--font-display); font-size: 1rem; font-weight: 600; background: var(--coral); color: var(--white); border: none; cursor: pointer; padding: 14px 28px; border-radius: 10px; text-decoration: none; transition: background .2s, transform .15s, box-shadow .2s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+  .btn-coral:hover { background: #E85A24; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,0.4); }
+  .btn-outline { font-family: var(--font-display); font-size: 1rem; font-weight: 500; background: transparent; color: var(--navy); border: 1.5px solid var(--border); cursor: pointer; padding: 13px 24px; border-radius: 10px; text-decoration: none; transition: all .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .hero-origin { display: flex; align-items: flex-start; gap: 12px; background: rgba(0,168,204,0.06); border: 1px solid rgba(0,168,204,0.2); border-radius: 12px; padding: 14px 16px; max-width: 440px; }
+  .origin-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+  .origin-text { font-size: 0.82rem; color: var(--steel); line-height: 1.5; }
+  .origin-text strong { color: var(--navy); }
+
+  /* AUDIOGRAM */
+  .audiogram-container { position: relative; background: var(--white); border-radius: 20px; border: 1px solid var(--border); padding: 28px; box-shadow: 0 20px 60px rgba(13,43,78,0.08); }
+  .audiogram-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+  .audiogram-svg-wrap { width: 100%; height: 220px; }
+  .audiogram-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .astat { background: var(--ice); border-radius: 12px; padding: 12px; text-align: center; }
+  .astat-value { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--navy); display: block; }
+  .astat-label { font-size: 0.72rem; color: var(--text-muted); }
+  .float-badge { position: absolute; top: -16px; right: 24px; background: var(--coral); color: var(--white); font-family: var(--font-display); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 100px; box-shadow: 0 4px 16px rgba(255,107,53,0.35); animation: floatBadge 3s ease-in-out infinite; }
+  @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+  /* SECTIONS */
+  .section { padding: 96px 5%; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-ice { background: var(--ice); }
+  .section-navy { background: var(--navy); }
+  .section-eyebrow { font-family: var(--font-display); font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; }
+  .section-title { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -1px; line-height: 1.15; color: var(--navy); margin-bottom: 16px; }
+  .section-title.light { color: var(--white); }
+  .section-sub { font-size: 1.05rem; color: var(--text-muted); max-width: 540px; line-height: 1.7; }
+  .section-sub.light { color: rgba(255,255,255,0.65); }
+  .section-head { text-align: center; margin-bottom: 56px; }
+  .section-head .section-sub { margin: 0 auto; }
+
+  /* ORIGEM BANNER */
+  .origin-banner { background: var(--navy); padding: 64px 5%; }
+  .origin-banner-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .ob-label { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; }
+  .ob-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; color: var(--white); line-height: 1.2; margin-bottom: 16px; }
+  .ob-text { font-size: 0.92rem; color: rgba(255,255,255,0.6); line-height: 1.7; }
+  .ob-stats { display: flex; flex-direction: column; gap: 20px; }
+  .ob-stat { display: flex; align-items: center; gap: 16px; }
+  .ob-num { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--cyan); letter-spacing: -1px; min-width: 72px; }
+  .ob-desc { font-size: 0.88rem; color: rgba(255,255,255,0.6); line-height: 1.4; }
+  .ob-desc strong { color: rgba(255,255,255,0.9); display: block; }
+
+  /* PAIN */
+  .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .pain-card { background: var(--white); border-radius: 16px; border: 1px solid var(--border); padding: 32px; }
+  .pain-icon { width: 48px; height: 48px; background: #FFF0EB; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 1.4rem; }
+  .pain-card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; color: var(--navy); }
+  .pain-card p { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* FEATURES */
+  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; padding: 48px 0; border-top: 1px solid var(--border); }
+  .feature-row:first-child { border-top: none; }
+  .feature-row.reverse .feature-visual { order: -1; }
+  .feature-tag { display: inline-block; background: var(--ice); color: var(--cyan); font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; margin-bottom: 16px; border: 1px solid var(--border); }
+  .feature-text h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; color: var(--navy); }
+  .feature-text p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--steel); }
+  .feature-list li::before { content: ''; width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='10' fill='%2300A8CC'/%3E%3Cpath d='M6 10l3 3 5-5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .feature-visual { background: var(--white); border-radius: 20px; border: 1px solid var(--border); padding: 32px; box-shadow: 0 12px 40px rgba(13,43,78,0.06); min-height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+
+  /* MOCKS */
+  .agenda-mock { width: 100%; }
+  .agenda-header { font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; color: var(--navy); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .agenda-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+  .agenda-slot { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 0.82rem; border: 1px solid transparent; }
+  .slot-time { font-family: var(--font-display); font-weight: 700; color: var(--navy); min-width: 42px; }
+  .slot-name { flex: 1; font-weight: 500; }
+  .slot-type { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 100px; }
+  .slot-a { background: #E8F3F8; border-color: var(--border); }
+  .slot-a .slot-type { background: var(--cyan); color: white; }
+  .slot-b { background: #FFF0EB; border-color: #FFD0BC; }
+  .slot-b .slot-type { background: var(--coral); color: white; }
+  .slot-c { background: #F0F7F0; border-color: #C8E6C9; }
+  .slot-c .slot-type { background: #4CAF50; color: white; }
+  .slot-new { background: var(--ice); border: 1.5px dashed var(--border); border-radius: 10px; padding: 10px 14px; text-align: center; font-size: 0.78rem; color: var(--text-muted); }
+
+  .stock-mock { width: 100%; }
+  .stock-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ice); font-size: 0.82rem; }
+  .stock-row:last-child { border-bottom: none; }
+  .stock-name { flex: 1; font-weight: 500; color: var(--navy); }
+  .stock-brand { font-size: 0.72rem; color: var(--text-muted); }
+  .stock-qty { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--navy); min-width: 28px; text-align: center; }
+  .stock-status { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 100px; }
+  .s-ok { background: #E8F5E9; color: #2E7D32; }
+  .s-low { background: #FFF3E0; color: #E65100; }
+  .s-out { background: #FFEBEE; color: #C62828; }
+  .stock-header { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+
+  .chart-mock { width: 100%; }
+  .chart-title { font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .chart-sub { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 20px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; border-bottom: 1px solid var(--border); }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--cyan), rgba(0,168,204,0.4)); }
+  .bar.highlight { background: linear-gradient(180deg, var(--coral), rgba(255,107,53,0.4)); }
+  .bar-label { font-size: 0.65rem; color: var(--text-muted); }
+  .chart-metric { display: flex; gap: 24px; margin-top: 16px; }
+  .cm-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--navy); }
+  .cm-label { font-size: 0.72rem; color: var(--text-muted); }
+  .cm-delta { font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; color: #2E7D32; }
+
+  /* LGPD SECTION */
+  .lgpd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .lgpd-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .lgpd-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 24px; }
+  .lgpd-card-icon { font-size: 1.6rem; margin-bottom: 12px; }
+  .lgpd-card h4 { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .lgpd-card p { font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+  .lgpd-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,168,204,0.15); border: 1px solid rgba(0,168,204,0.3); border-radius: 100px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; color: var(--cyan); margin-bottom: 16px; }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+  .price-card { background: var(--white); border-radius: 20px; border: 1px solid var(--border); padding: 36px 32px; position: relative; }
+  .price-card.featured { background: var(--navy); border-color: var(--navy); transform: scale(1.04); box-shadow: 0 24px 64px rgba(13,43,78,0.25); }
+  .price-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--coral); color: var(--white); font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 16px; border-radius: 100px; white-space: nowrap; }
+  .plan-name { font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .price-card.featured .plan-name { color: rgba(255,255,255,0.5); }
+  .plan-price { font-family: var(--font-display); font-size: 2.8rem; font-weight: 800; letter-spacing: -2px; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .plan-price.consult { font-size: 1.6rem; letter-spacing: -0.5px; padding-top: 8px; }
+  .price-card.featured .plan-price { color: var(--white); }
+  .plan-price span { font-size: 1rem; font-weight: 400; letter-spacing: 0; }
+  .plan-period { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 24px; }
+  .price-card.featured .plan-period { color: rgba(255,255,255,0.5); }
+  .plan-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+  .price-card.featured .plan-desc { color: rgba(255,255,255,0.65); }
+  .plan-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
+  .price-card.featured .plan-divider { border-color: rgba(255,255,255,0.15); }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .plan-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; color: var(--steel); }
+  .price-card.featured .plan-features li { color: rgba(255,255,255,0.8); }
+  .plan-check { font-size: 0.9rem; color: var(--cyan); }
+  .btn-plan { width: 100%; font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; padding: 14px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; color: var(--navy); cursor: pointer; transition: all .2s; text-align: center; text-decoration: none; display: block; }
+  .btn-plan:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn-plan.featured { background: var(--coral); color: var(--white); border-color: var(--coral); box-shadow: 0 4px 16px rgba(255,107,53,0.3); }
+  .btn-plan.featured:hover { background: #E85A24; }
+
+  /* LISTA DE ESPERA */
+  .waitlist-section { background: var(--navy); padding: 96px 5%; text-align: center; }
+  .waitlist-inner { max-width: 600px; margin: 0 auto; }
+  .waitlist-section h2 { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -1px; color: var(--white); margin-bottom: 16px; }
+  .waitlist-section p { color: rgba(255,255,255,0.6); font-size: 1rem; margin-bottom: 36px; line-height: 1.7; }
+  .waitlist-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto 20px; }
+  .waitlist-input { flex: 1; padding: 14px 18px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); color: var(--white); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color .2s; }
+  .waitlist-input::placeholder { color: rgba(255,255,255,0.3); }
+  .waitlist-input:focus { border-color: var(--cyan); }
+  .btn-waitlist { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; background: var(--coral); color: var(--white); border: none; cursor: pointer; padding: 14px 24px; border-radius: 10px; white-space: nowrap; transition: background .2s; }
+  .btn-waitlist:hover { background: #E85A24; }
+  .waitlist-alts { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-ghost-white { font-family: var(--font-display); font-size: 0.9rem; font-weight: 500; background: transparent; color: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.15); cursor: pointer; padding: 12px 20px; border-radius: 10px; text-decoration: none; transition: all .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-ghost-white:hover { color: var(--white); border-color: rgba(255,255,255,0.4); }
+  .waitlist-note { font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-top: 16px; }
+
+  /* FOOTER */
+  footer { background: #071A30; padding: 60px 5% 36px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.7; margin-top: 12px; max-width: 220px; }
+  .footer-col h4 { font-family: var(--font-display); font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul li a { font-size: 0.88rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color .2s; }
+  .footer-col ul li a:hover { color: rgba(255,255,255,0.9); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.25); }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+
+  /* SUCCESS STATE */
+  .waitlist-success { display: none; background: rgba(0,168,204,0.1); border: 1px solid rgba(0,168,204,0.3); border-radius: 12px; padding: 20px 24px; text-align: center; }
+  .waitlist-success.show { display: block; }
+  .waitlist-success p { color: var(--cyan); font-weight: 500; font-size: 0.95rem; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .audiogram-container { display: none; }
+    .pain-grid { grid-template-columns: 1fr; }
+    .feature-row { grid-template-columns: 1fr; }
+    .feature-row.reverse .feature-visual { order: 0; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .price-card.featured { transform: none; }
+    .lgpd-grid { grid-template-columns: 1fr; }
+    .lgpd-visual { grid-template-columns: 1fr 1fr; }
+    .origin-banner-inner { grid-template-columns: 1fr; gap: 32px; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .waitlist-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 10 Q7 4 10 10 Q13 16 16 10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    Auris<span>AI</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Funcionalidades</a></li>
+    <li><a href="#pricing">Preços</a></li>
+    <li><a href="#seguranca">Segurança</a></li>
+    <li><a href="#waitlist">Lista de espera</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#waitlist" class="btn-ghost">Quero ser piloto</a>
+    <a href="#waitlist" class="btn-primary">Entrar na lista ✦</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot pulse"></div>
+        Em desenvolvimento — clínicas piloto abertas
+      </div>
+      <h1>O sistema de gestão feito para quem <em>vende e adapta</em> aparelhos auditivos</h1>
+      <p>Agenda, prontuário audiológico, controle de estoque de AASI, convênios e BI clínico. Tudo em uma plataforma construída por dentro do setor.</p>
+      <div class="hero-actions">
+        <a href="#waitlist" class="btn-coral">Entrar na lista de espera ✦</a>
+        <a href="#waitlist" class="btn-outline">🧪 Ser clínica piloto</a>
+      </div>
+      <div class="hero-origin">
+        <div class="origin-icon">👂</div>
+        <div class="origin-text">
+          <strong>Criado a partir de 9 anos de experiência real</strong>
+          no setor de aparelhos auditivos — do Help Desk à análise de dados para liderança executiva.
+        </div>
+      </div>
+    </div>
+    <div class="audiogram-container">
+      <div class="float-badge">Em desenvolvimento</div>
+      <div class="audiogram-label">Audiograma Tonal — Resumo do Dia</div>
+      <div class="audiogram-svg-wrap">
+        <svg id="audiogramSVG" viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <line x1="40" y1="20" x2="400" y2="20" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="40" y1="60" x2="400" y2="60" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="40" y1="100" x2="400" y2="100" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="40" y1="140" x2="400" y2="140" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="40" y1="180" x2="400" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="100" y1="20" x2="100" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="160" y1="20" x2="160" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="220" y1="20" x2="220" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="280" y1="20" x2="280" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="340" y1="20" x2="340" y2="180" stroke="#E8F3F8" stroke-width="1"/>
+          <line x1="40" y1="20" x2="40" y2="180" stroke="#D0E4EE" stroke-width="1.5"/>
+          <text x="30" y="24" font-size="9" fill="#5A7A8C" text-anchor="end">-10</text>
+          <text x="30" y="64" font-size="9" fill="#5A7A8C" text-anchor="end">20</text>
+          <text x="30" y="104" font-size="9" fill="#5A7A8C" text-anchor="end">50</text>
+          <text x="30" y="144" font-size="9" fill="#5A7A8C" text-anchor="end">80</text>
+          <text x="30" y="184" font-size="9" fill="#5A7A8C" text-anchor="end">110</text>
+          <text x="100" y="195" font-size="9" fill="#5A7A8C" text-anchor="middle">500</text>
+          <text x="160" y="195" font-size="9" fill="#5A7A8C" text-anchor="middle">1k</text>
+          <text x="220" y="195" font-size="9" fill="#5A7A8C" text-anchor="middle">2k</text>
+          <text x="280" y="195" font-size="9" fill="#5A7A8C" text-anchor="middle">4k</text>
+          <text x="340" y="195" font-size="9" fill="#5A7A8C" text-anchor="middle">8k</text>
+          <rect x="40" y="20" width="360" height="20" fill="#00A8CC" opacity="0.06" rx="2"/>
+          <text x="45" y="35" font-size="8" fill="#00A8CC" opacity="0.8">audição normal</text>
+          <path id="curveR" d="M100,45 L160,52 L220,68 L280,95 L340,118 L390,135" stroke="#00A8CC" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="100" cy="45" r="5" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <circle cx="160" cy="52" r="5" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <circle cx="220" cy="68" r="5" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <circle cx="280" cy="95" r="5" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <circle cx="340" cy="118" r="5" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <path id="curveL" d="M100,38 L160,44 L220,55 L280,72 L340,90 L390,108" stroke="#FF6B35" stroke-width="2.5" fill="none" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"/>
+          <text font-size="12" fill="#FF6B35" text-anchor="middle" dominant-baseline="middle" x="100" y="38">×</text>
+          <text font-size="12" fill="#FF6B35" text-anchor="middle" dominant-baseline="middle" x="160" y="44">×</text>
+          <text font-size="12" fill="#FF6B35" text-anchor="middle" dominant-baseline="middle" x="220" y="55">×</text>
+          <text font-size="12" fill="#FF6B35" text-anchor="middle" dominant-baseline="middle" x="280" y="72">×</text>
+          <text font-size="12" fill="#FF6B35" text-anchor="middle" dominant-baseline="middle" x="340" y="90">×</text>
+          <line x1="48" y1="164" x2="68" y2="164" stroke="#00A8CC" stroke-width="2"/>
+          <circle cx="58" cy="164" r="3" fill="white" stroke="#00A8CC" stroke-width="2"/>
+          <text x="72" y="168" font-size="9" fill="#5A7A8C">OE</text>
+          <line x1="100" y1="164" x2="120" y2="164" stroke="#FF6B35" stroke-width="2" stroke-dasharray="4 2"/>
+          <text x="122" y="164" font-size="10" fill="#FF6B35" dominant-baseline="middle">×</text>
+          <text x="134" y="168" font-size="9" fill="#5A7A8C">OD</text>
+        </svg>
+      </div>
+      <div class="audiogram-stats">
+        <div class="astat"><span class="astat-value">12</span><span class="astat-label">Consultas/dia</span></div>
+        <div class="astat"><span class="astat-value" style="color:var(--cyan)">3</span><span class="astat-label">Retornos</span></div>
+        <div class="astat"><span class="astat-value" style="color:var(--coral)">R$4.8k</span><span class="astat-label">Faturamento</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORIGEM -->
+<div class="origin-banner">
+  <div class="origin-banner-inner">
+    <div>
+      <div class="ob-label">Por que o AurisAI existe</div>
+      <h2 class="ob-title">Construído por quem conhece cada etapa da jornada de um aparelho auditivo</h2>
+      <p class="ob-text">Depois de quase uma década trabalhando dentro de uma das maiores empresas de audiologia do mundo — do atendimento técnico à inteligência de dados para a diretoria — ficou claro: nenhum sistema existente foi pensado para a realidade das clínicas que vendem e adaptam AASI no Brasil.</p>
+    </div>
+    <div class="ob-stats">
+      <div class="ob-stat">
+        <div class="ob-num">9+</div>
+        <div class="ob-desc"><strong>anos no setor de audiologia</strong>experiência real em processos clínicos, comerciais e de dados</div>
+      </div>
+      <div class="ob-stat">
+        <div class="ob-num">0</div>
+        <div class="ob-desc"><strong>sistemas específicos para audiologia no Brasil</strong>que cobrem estoque de AASI + BI clínico + prontuário integrado</div>
+      </div>
+      <div class="ob-stat">
+        <div class="ob-num">1</div>
+        <div class="ob-desc"><strong>plataforma sendo construída do zero</strong>com quem viveu o problema — não apenas modelou ele de fora</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DORES -->
+<section class="section section-ice" id="pain">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-eyebrow">O problema</div>
+      <h2 class="section-title">Sistemas genéricos não entendem<br>o que é uma clínica de audiologia</h2>
+      <p class="section-sub">Você não gerencia apenas pacientes — você gerencia aparelhos auditivos, audiogramas, convênios complexos e um estoque de alta rastreabilidade. Nenhum ERP genérico foi feito para isso.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">📋</div>
+        <h3>Agenda descentralizada</h3>
+        <p>Consultas perdidas entre planilhas, WhatsApp e cadernos. Sem confirmação automática, sem histórico integrado ao prontuário audiológico.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📦</div>
+        <h3>Aparelhos sem rastreamento</h3>
+        <p>Sem saber quantos AASI estão em demonstração, em reparo ou em estoque. Uma gaveta cheia de aparelhos sem controle de número de série.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📊</div>
+        <h3>BI que não fala audiologia</h3>
+        <p>Relatórios genéricos que não mostram taxa de retorno, índice de adaptação de AASI, ou os convênios que mais geram inadimplência.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-eyebrow">Funcionalidades</div>
+      <h2 class="section-title">Tudo que sua clínica precisa,<br>pensado do zero para audiologia</h2>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-text">
+        <span class="feature-tag">Agenda</span>
+        <h3>Agendamento inteligente com confirmação automática</h3>
+        <p>Visualize sua agenda do dia em segundos. AurisAI envia confirmações por WhatsApp, reduz faltas e mantém o histórico de cada paciente integrado ao audiograma.</p>
+        <ul class="feature-list">
+          <li>Confirmação automática via WhatsApp</li>
+          <li>Identificação de retornos e primeiras consultas</li>
+          <li>Bloqueio de horários por sala e equipamento</li>
+          <li>Integração direta com prontuário audiológico</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="agenda-mock">
+          <div class="agenda-header">Agenda de hoje — Quarta-feira<div class="agenda-dot pulse"></div></div>
+          <div class="agenda-slot slot-a"><span class="slot-time">08:00</span><span class="slot-name">Maria Aparecida S.</span><span class="slot-type">Audiometria</span></div>
+          <div class="agenda-slot slot-b"><span class="slot-time">09:30</span><span class="slot-name">José Carlos R.</span><span class="slot-type">Retorno AASI</span></div>
+          <div class="agenda-slot slot-c"><span class="slot-time">11:00</span><span class="slot-name">Ana Paula M.</span><span class="slot-type">Molde</span></div>
+          <div class="agenda-slot slot-a"><span class="slot-time">14:00</span><span class="slot-name">Roberto T. F.</span><span class="slot-type">PEATE</span></div>
+          <div class="slot-new">+ Novo agendamento</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-text">
+        <span class="feature-tag">Estoque</span>
+        <h3>Controle de AASI por número de série</h3>
+        <p>Rastreie cada aparelho auditivo: em estoque, em demonstração, em adaptação, em garantia ou em reparo. Nunca mais perca um aparelho ou descubra um problema no inventário.</p>
+        <ul class="feature-list">
+          <li>Controle por número de série e modelo</li>
+          <li>Status em tempo real: demonstração, adaptação, reparo</li>
+          <li>Alertas de estoque mínimo por marca</li>
+          <li>Histórico completo por aparelho</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="stock-mock">
+          <div class="stock-header">📦 Estoque de AASI</div>
+          <div class="stock-row"><div><div class="stock-name">Phonak Lumity 90R</div><div class="stock-brand">Sonova · BTE</div></div><span class="stock-qty">4</span><span class="stock-status s-ok">Em estoque</span></div>
+          <div class="stock-row"><div><div class="stock-name">Widex Moment Sheer</div><div class="stock-brand">WS Audiology · RIC</div></div><span class="stock-qty">1</span><span class="stock-status s-low">Estoque baixo</span></div>
+          <div class="stock-row"><div><div class="stock-name">Oticon Real 1</div><div class="stock-brand">Demant · RIC</div></div><span class="stock-qty">2</span><span class="stock-status s-ok">Em estoque</span></div>
+          <div class="stock-row"><div><div class="stock-name">Signia AX 7</div><div class="stock-brand">WSAudiology · BTE</div></div><span class="stock-qty">0</span><span class="stock-status s-out">Esgotado</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-text">
+        <span class="feature-tag">BI Clínico</span>
+        <h3>Relatórios que só fazem sentido em audiologia</h3>
+        <p>Taxa de adaptação de AASI, índice de retorno, faturamento por convênio, quais exames geram mais receita. Dados do seu nicho, não de uma clínica genérica.</p>
+        <ul class="feature-list">
+          <li>Taxa de conversão: consulta → adaptação AASI</li>
+          <li>Faturamento por convênio e por audiologista</li>
+          <li>Análise de sazonalidade de exames</li>
+          <li>Painel executivo exportável (PDF, Excel)</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="chart-mock">
+          <div class="chart-title">Faturamento Mensal</div>
+          <div class="chart-sub">Últimos 6 meses · todas as receitas</div>
+          <div class="chart-bars">
+            <div class="bar-wrap"><div class="bar" style="height:55%"></div><span class="bar-label">Jan</span></div>
+            <div class="bar-wrap"><div class="bar" style="height:68%"></div><span class="bar-label">Fev</span></div>
+            <div class="bar-wrap"><div class="bar" style="height:62%"></div><span class="bar-label">Mar</span></div>
+            <div class="bar-wrap"><div class="bar" style="height:80%"></div><span class="bar-label">Abr</span></div>
+            <div class="bar-wrap"><div class="bar" style="height:74%"></div><span class="bar-label">Mai</span></div>
+            <div class="bar-wrap"><div class="bar highlight" style="height:100%"></div><span class="bar-label">Jun</span></div>
+          </div>
+          <div class="chart-metric">
+            <div class="cm"><div class="cm-value">R$ 48.2k</div><div class="cm-label">Junho (atual)</div><div class="cm-delta">▲ +18% vs mês anterior</div></div>
+            <div class="cm"><div class="cm-value">87%</div><div class="cm-label">Taxa adaptação AASI</div><div class="cm-delta">▲ +5pp</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEGURANÇA / LGPD -->
+<section class="section section-navy" id="seguranca">
+  <div class="section-inner">
+    <div class="lgpd-grid">
+      <div>
+        <div class="lgpd-badge">🔒 LGPD Compliant</div>
+        <div class="section-eyebrow">Segurança</div>
+        <h2 class="section-title light">Segurança e LGPD desde o primeiro dia</h2>
+        <p class="section-sub light">Prontuário audiológico é dado sensível de saúde — protegido pelo Art. 11 da LGPD. O AurisAI foi projetado com privacidade como fundação, não como funcionalidade adicionada depois.</p>
+        <br><br>
+        <p style="font-size:0.85rem;color:rgba(255,255,255,0.4);line-height:1.6;">Todas as comunicações são criptografadas. Backups automáticos diários. Acesso por perfil de usuário com histórico de alterações auditável. Consentimento de dados registrado no prontuário.</p>
+      </div>
+      <div class="lgpd-visual">
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">🔐</div>
+          <h4>Criptografia ponta a ponta</h4>
+          <p>Dados em trânsito e em repouso criptografados com AES-256.</p>
+        </div>
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">👤</div>
+          <h4>Controle de acesso</h4>
+          <p>Perfis por função: recepcionista, audiologista, gestor, rede.</p>
+        </div>
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">📋</div>
+          <h4>Histórico auditável</h4>
+          <p>Cada alteração em prontuário registrada com data, hora e usuário.</p>
+        </div>
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">💾</div>
+          <h4>Backup automático</h4>
+          <p>Backups diários redundantes. Nenhum dado de paciente é perdido.</p>
+        </div>
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">✅</div>
+          <h4>Consentimento registrado</h4>
+          <p>TCLE digital integrado ao prontuário, conforme resolução CFO/CFFa.</p>
+        </div>
+        <div class="lgpd-card">
+          <div class="lgpd-card-icon">🏥</div>
+          <h4>Servidor no Brasil</h4>
+          <p>Dados hospedados em território nacional, conforme Art. 33 da LGPD.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-eyebrow">Planos</div>
+      <h2 class="section-title">Preços pensados para a realidade<br>das clínicas brasileiras</h2>
+      <p class="section-sub">Valores de referência — os planos finais serão validados com as clínicas piloto. Participe e influencie o que entra em cada plano.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="plan-name">Essencial</div>
+        <div class="plan-price">R$<span> </span>197<span>/mês</span></div>
+        <div class="plan-period">por profissional · até 2 usuários</div>
+        <div class="plan-desc">Para audiologistas solo ou clínicas pequenas com até 2 profissionais.</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> Agenda e prontuário audiológico</li>
+          <li><span class="plan-check">✓</span> Controle de estoque AASI</li>
+          <li><span class="plan-check">✓</span> Relatórios básicos</li>
+          <li><span class="plan-check">✓</span> Até 2 usuários</li>
+          <li><span class="plan-check">✓</span> Suporte via chat</li>
+          <li><span class="plan-check">✓</span> LGPD compliant</li>
+        </ul>
+        <a href="#waitlist" class="btn-plan">Entrar na lista de espera</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Mais completo</div>
+        <div class="plan-name">Profissional</div>
+        <div class="plan-price">R$<span> </span>397<span>/mês</span></div>
+        <div class="plan-period">por clínica · até 5 profissionais</div>
+        <div class="plan-desc">Para clínicas em crescimento que precisam de automações, BI avançado e integração com convênios.</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> Tudo do Essencial</li>
+          <li><span class="plan-check">✓</span> Confirmações automáticas (WhatsApp)</li>
+          <li><span class="plan-check">✓</span> BI Clínico avançado</li>
+          <li><span class="plan-check">✓</span> Gestão de convênios</li>
+          <li><span class="plan-check">✓</span> Até 5 usuários</li>
+          <li><span class="plan-check">✓</span> Integrações (n8n, Zapier)</li>
+          <li><span class="plan-check">✓</span> Suporte prioritário</li>
+        </ul>
+        <a href="#waitlist" class="btn-plan featured">Entrar na lista ✦</a>
+      </div>
+      <div class="price-card">
+        <div class="plan-name">Rede</div>
+        <div class="plan-price consult">Sob<br>consulta</div>
+        <div class="plan-period">redes e franquias · usuários ilimitados</div>
+        <div class="plan-desc">Para redes de clínicas com múltiplas unidades, necessidades específicas e volume de atendimento elevado.</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> Tudo do Profissional</li>
+          <li><span class="plan-check">✓</span> Multi-unidade e dashboard consolidado</li>
+          <li><span class="plan-check">✓</span> API de integração</li>
+          <li><span class="plan-check">✓</span> Usuários ilimitados</li>
+          <li><span class="plan-check">✓</span> Onboarding dedicado</li>
+          <li><span class="plan-check">✓</span> SLA contratual</li>
+        </ul>
+        <a href="#waitlist" class="btn-plan">Falar com a equipe</a>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:28px;font-size:0.82rem;color:var(--text-muted);">💡 Valores de referência sujeitos a ajuste após validação com clínicas piloto. Sem taxa de setup. Sem contrato de fidelidade.</p>
+  </div>
+</section>
+
+<!-- LISTA DE ESPERA -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="section-eyebrow" style="color:var(--cyan);margin-bottom:12px;">Acesso antecipado</div>
+    <h2>Seja uma das primeiras clínicas a usar o AurisAI</h2>
+    <p>Entre na lista de espera e receba acesso antecipado, preço de fundador e a chance de moldar as funcionalidades que mais importam para a sua clínica.</p>
+
+    <div class="waitlist-form">
+      <input type="email" class="waitlist-input" id="emailInput" placeholder="seu@email.com.br">
+      <button class="btn-waitlist" onclick="handleWaitlist()">Quero entrar ✦</button>
+    </div>
+    <div class="waitlist-success" id="successMsg">
+      <p>✓ Ótimo! Você está na lista. Entraremos em contato em breve.</p>
+    </div>
+
+    <div class="waitlist-alts">
+      <a href="mailto:contato@aurisai.com.br" class="btn-ghost-white">🧪 Quero ser clínica piloto</a>
+      <a href="mailto:contato@aurisai.com.br" class="btn-ghost-white">📅 Agendar demonstração</a>
+    </div>
+    <p class="waitlist-note">Sem spam. Você pode sair da lista a qualquer momento. Seus dados são protegidos pela LGPD.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="logo" style="color:white;">
+          <div class="logo-mark">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 10 Q7 4 10 10 Q13 16 16 10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+          Auris<span style="color:var(--cyan)">AI</span>
+        </a>
+        <p>Software de gestão clínica desenvolvido por especialistas em audiologia para clínicas de audiologia.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Produto</h4>
+        <ul>
+          <li><a href="#features">Funcionalidades</a></li>
+          <li><a href="#pricing">Preços</a></li>
+          <li><a href="#seguranca">Segurança e LGPD</a></li>
+          <li><a href="#waitlist">Lista de espera</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="#">Sobre o projeto</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Clínicas piloto</a></li>
+          <li><a href="mailto:contato@aurisai.com.br">Contato</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Política de Privacidade</a></li>
+          <li><a href="#">Termos de Uso</a></li>
+          <li><a href="#">LGPD</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 AurisAI · aurisai.com.br · Todos os direitos reservados</p>
+      <p>Feito com 9 anos de vivência no setor · São Paulo, Brasil</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Audiogram animation
+  const curveR = document.getElementById('curveR');
+  if (curveR) {
+    const paths = [
+      "M100,45 L160,52 L220,68 L280,95 L340,118 L390,135",
+      "M100,42 L160,50 L220,72 L280,100 L340,122 L390,138",
+      "M100,47 L160,55 L220,65 L280,90 L340,115 L390,132"
+    ];
+    let idx = 0;
+    setInterval(() => { idx = (idx + 1) % paths.length; curveR.setAttribute('d', paths[idx]); }, 2000);
+  }
+
+  // Waitlist form
+  function handleWaitlist() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = '#FF6B35';
+      document.getElementById('emailInput').focus();
+      return;
+    }
+    document.querySelector('.waitlist-form').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+    // Aqui: integrar com Supabase / n8n / Mailchimp
+    console.log('Lead capturado:', email);
+  }
+
+  document.getElementById('emailInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleWaitlist();
+    e.target.style.borderColor = '';
+  });
+
+  // Nav scroll shadow
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.boxShadow = window.scrollY > 20 ? '0 4px 24px rgba(13,43,78,0.08)' : 'none';
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const href = a.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+</body>
+</html>
