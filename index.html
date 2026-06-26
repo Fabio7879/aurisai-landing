@@ -1201,27 +1201,11 @@
       document.getElementById('btnIntra').style.color=!isRetro?'white':'var(--text-muted)';
       document.getElementById('btnIntra').style.borderColor=!isRetro?'var(--cyan)':'var(--border)';
 
-      // Intra = always 1 audiogram (por ouvido — mas mostramos só 1 para simplificar)
-      if(!isRetro){
-        document.getElementById('agPanelOE').style.display='none';
-        // Show note
-        let note=document.getElementById('agIntraNote');
-        if(!note){
-          note=document.createElement('div');
-          note.id='agIntraNote';
-          note.style.cssText='font-size:0.65rem;color:var(--steel);padding:4px 8px;background:#EFF6FF;border-radius:6px;margin-top:6px;border-left:2px solid #2563EB;';
-          note.innerHTML='ℹ️ AASI Intra: adaptação por ouvido — selecione o lado acima';
-          document.getElementById('agWrapper').after(note);
-        }
-        note.style.display='';
-      } else {
-        const note=document.getElementById('agIntraNote');
-        if(note)note.style.display='none';
-        // Re-apply bilateral if was bilateral
-        if(st.loss==='bilateral'){
-          document.getElementById('agPanelOE').style.display='';
-        }
-      }
+      // Regra correta: número de audiogramas depende APENAS da lateralidade
+      // Unilateral → 1 audiograma (independente de Retro ou Intra)
+      // Bilateral  → 2 audiogramas (independente de Retro ou Intra)
+      const isBilateral = st.loss === 'bilateral';
+      document.getElementById('agPanelOE').style.display = isBilateral ? '' : 'none';
     };
 
     window.agPreviewFile=function(e){
