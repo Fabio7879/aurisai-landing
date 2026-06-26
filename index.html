@@ -295,87 +295,111 @@
         </div>
       </div>
     </div>
-    <div class="audiogram-container">
+    <div class="audiogram-container" style="padding:20px;">
       <div class="float-badge">Em desenvolvimento</div>
-      <!-- ERP Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div>
-          <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Audiograma Tonal</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:1px;">Maria A. S. &nbsp;·&nbsp; 14/06/2025</div>
-        </div>
-        <span id="agClassBadge" style="font-size:0.65rem;font-weight:700;padding:3px 9px;border-radius:100px;background:var(--ice);color:var(--text-muted);white-space:nowrap;">Aguardando...</span>
-      </div>
 
-      <!-- Toolbar -->
-      <div style="display:flex;gap:4px;margin-bottom:7px;flex-wrap:wrap;align-items:center;">
-        <button id="agBtnOD" onclick="agSetEar('OD')" style="font-size:0.68rem;font-weight:600;padding:4px 10px;border-radius:6px;border:1.5px solid #DC2626;background:#DC2626;color:white;cursor:pointer;">● OD</button>
-        <button id="agBtnOE" onclick="agSetEar('OE')" style="font-size:0.68rem;font-weight:600;padding:4px 10px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">× OE</button>
-        <div style="width:1px;height:16px;background:var(--border);margin:0 2px;"></div>
-        <button id="agBtnVA" onclick="agSetType('VA')" style="font-size:0.68rem;font-weight:600;padding:4px 10px;border-radius:6px;border:1.5px solid var(--navy);background:var(--ice);color:var(--navy);cursor:pointer;">Via Aérea</button>
-        <button id="agBtnVO" onclick="agSetType('VO')" style="font-size:0.68rem;font-weight:500;padding:4px 10px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Via Óssea</button>
-        <div style="margin-left:auto;display:flex;gap:4px;">
-          <button onclick="agUndo()" title="Desfazer" style="font-size:0.68rem;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">↩</button>
-          <button onclick="agClear()" title="Limpar" style="font-size:0.68rem;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">✕</button>
+      <!-- Seleção tipo de perda + AASI -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Tipo de Perda</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <button id="btnUni" onclick="agSelectLoss('unilateral')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid #DC2626;background:#DC2626;color:white;cursor:pointer;">Unilateral</button>
+          <button id="btnBi" onclick="agSelectLoss('bilateral')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Bilateral</button>
+        </div>
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Tipo de AASI</div>
+        <div style="display:flex;gap:6px;">
+          <button id="btnRetro" onclick="agSelectAasi('retro')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid var(--cyan);background:var(--cyan);color:white;cursor:pointer;">Retro (BTE/RIC)</button>
+          <button id="btnIntra" onclick="agSelectAasi('intra')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Intra (ITE/CIC)</button>
         </div>
       </div>
 
-      <!-- Hint -->
-      <div id="agHint" style="font-size:0.65rem;color:var(--steel);margin-bottom:6px;padding:4px 8px;background:var(--ice);border-radius:6px;border-left:2.5px solid #DC2626;">
-        👆 Clique no gráfico para inserir o limiar auditivo
+      <!-- Audiograms wrapper -->
+      <div id="agWrapper" style="display:flex;gap:10px;transition:all .3s;">
+
+        <!-- Audiograma OD -->
+        <div id="agPanelOD" style="flex:1;min-width:0;">
+          <div style="font-size:0.68rem;font-weight:700;text-align:center;color:#DC2626;margin-bottom:4px;letter-spacing:1px;">● OD — DIREITO</div>
+          <svg id="agSVG_OD" viewBox="0 0 300 190" style="width:100%;cursor:crosshair;display:block;border:1px solid var(--border);border-radius:8px;" xmlns="http://www.w3.org/2000/svg">
+            <defs><clipPath id="agClipOD"><rect x="34" y="14" width="252" height="156"/></clipPath></defs>
+            <g id="agBgOD"></g>
+            <g id="agHGridOD" opacity="0.4"></g>
+            <g id="agVGridOD" opacity="0.4"></g>
+            <g id="agYLabOD"></g>
+            <g id="agXLabOD"></g>
+            <g id="agLinesOD" clip-path="url(#agClipOD)"></g>
+            <g id="agPtsOD" clip-path="url(#agClipOD)"></g>
+            <rect x="34" y="14" width="252" height="156" fill="transparent" onclick="agClick(event,'OD')" onmousemove="agHover(event,'OD')" onmouseleave="agLeave('OD')"/>
+            <g id="agTipOD" visibility="hidden"><rect id="agTipBgOD" rx="3" fill="#0D2B4E" opacity="0.9"/><text id="agTipTxtOD" font-size="9" fill="white" font-weight="600"/></g>
+          </svg>
+          <!-- OD toolbar -->
+          <div style="display:flex;gap:4px;margin-top:5px;justify-content:center;">
+            <button id="agOD_VA" onclick="agSetType('OD','VA')" style="font-size:0.6rem;font-weight:600;padding:3px 8px;border-radius:5px;border:1px solid var(--navy);background:var(--ice);color:var(--navy);cursor:pointer;">VA</button>
+            <button id="agOD_VO" onclick="agSetType('OD','VO')" style="font-size:0.6rem;font-weight:500;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">VO</button>
+            <button onclick="agUndoEar('OD')" style="font-size:0.6rem;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">↩</button>
+            <button onclick="agClearEar('OD')" style="font-size:0.6rem;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">✕</button>
+          </div>
+          <div style="display:flex;gap:4px;margin-top:5px;">
+            <div style="flex:1;background:var(--ice);border-radius:6px;padding:6px;text-align:center;">
+              <div id="agPtaOD2" style="font-family:var(--font-display);font-size:1rem;font-weight:800;color:var(--navy);">—</div>
+              <div style="font-size:0.6rem;color:var(--text-muted);">PTA OD</div>
+            </div>
+            <div style="flex:1;background:var(--ice);border-radius:6px;padding:6px;text-align:center;">
+              <div id="agClsOD" style="font-family:var(--font-display);font-size:0.7rem;font-weight:700;color:var(--text-muted);">—</div>
+              <div style="font-size:0.6rem;color:var(--text-muted);">Grau</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audiograma OE -->
+        <div id="agPanelOE" style="flex:1;min-width:0;display:none;">
+          <div style="font-size:0.68rem;font-weight:700;text-align:center;color:#2563EB;margin-bottom:4px;letter-spacing:1px;">× OE — ESQUERDO</div>
+          <svg id="agSVG_OE" viewBox="0 0 300 190" style="width:100%;cursor:crosshair;display:block;border:1px solid var(--border);border-radius:8px;" xmlns="http://www.w3.org/2000/svg">
+            <defs><clipPath id="agClipOE"><rect x="34" y="14" width="252" height="156"/></clipPath></defs>
+            <g id="agBgOE"></g>
+            <g id="agHGridOE" opacity="0.4"></g>
+            <g id="agVGridOE" opacity="0.4"></g>
+            <g id="agYLabOE"></g>
+            <g id="agXLabOE"></g>
+            <g id="agLinesOE" clip-path="url(#agClipOE)"></g>
+            <g id="agPtsOE" clip-path="url(#agClipOE)"></g>
+            <rect x="34" y="14" width="252" height="156" fill="transparent" onclick="agClick(event,'OE')" onmousemove="agHover(event,'OE')" onmouseleave="agLeave('OE')"/>
+            <g id="agTipOE" visibility="hidden"><rect id="agTipBgOE" rx="3" fill="#0D2B4E" opacity="0.9"/><text id="agTipTxtOE" font-size="9" fill="white" font-weight="600"/></g>
+          </svg>
+          <!-- OE toolbar -->
+          <div style="display:flex;gap:4px;margin-top:5px;justify-content:center;">
+            <button id="agOE_VA" onclick="agSetType('OE','VA')" style="font-size:0.6rem;font-weight:600;padding:3px 8px;border-radius:5px;border:1px solid #2563EB;background:#EFF6FF;color:#2563EB;cursor:pointer;">VA</button>
+            <button id="agOE_VO" onclick="agSetType('OE','VO')" style="font-size:0.6rem;font-weight:500;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">VO</button>
+            <button onclick="agUndoEar('OE')" style="font-size:0.6rem;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">↩</button>
+            <button onclick="agClearEar('OE')" style="font-size:0.6rem;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">✕</button>
+          </div>
+          <div style="display:flex;gap:4px;margin-top:5px;">
+            <div style="flex:1;background:var(--ice);border-radius:6px;padding:6px;text-align:center;">
+              <div id="agPtaOE2" style="font-family:var(--font-display);font-size:1rem;font-weight:800;color:#2563EB;">—</div>
+              <div style="font-size:0.6rem;color:var(--text-muted);">PTA OE</div>
+            </div>
+            <div style="flex:1;background:var(--ice);border-radius:6px;padding:6px;text-align:center;">
+              <div id="agClsOE" style="font-family:var(--font-display);font-size:0.7rem;font-weight:700;color:var(--text-muted);">—</div>
+              <div style="font-size:0.6rem;color:var(--text-muted);">Grau</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /agWrapper -->
+
+      <!-- Relatório de Fitting -->
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;">Relatório de Fitting</div>
+        <label id="agUploadLabel" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;background:var(--ice);transition:all .2s;" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:1rem;">📎</span>
+          <span style="font-size:0.72rem;color:var(--steel);font-weight:500;">Anexar relatório de programação</span>
+          <input type="file" id="agFileInput" accept="image/*,.pdf" style="display:none;" onchange="agPreviewFile(event)"/>
+        </label>
+        <div id="agPreviewWrap" style="display:none;margin-top:8px;position:relative;">
+          <img id="agPreviewImg" src="" style="width:100%;border-radius:8px;border:1px solid var(--border);max-height:140px;object-fit:contain;background:#f8f9fa;"/>
+          <button onclick="agRemoveFile()" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(13,43,78,0.7);color:white;border:none;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;">✕</button>
+          <div id="agFileName" style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;text-align:center;"></div>
+        </div>
       </div>
 
-      <!-- Interactive Audiogram SVG -->
-      <svg id="agSVG" viewBox="0 0 440 218" style="width:100%;cursor:crosshair;display:block;" xmlns="http://www.w3.org/2000/svg">
-        <defs><clipPath id="agClip"><rect x="40" y="18" width="378" height="180"/></clipPath></defs>
-        <!-- Background hearing zones -->
-        <rect x="40" y="18"  width="378" height="30" fill="#10B981" opacity="0.07"/>
-        <rect x="40" y="48"  width="378" height="30" fill="#84CC16" opacity="0.06"/>
-        <rect x="40" y="78"  width="378" height="30" fill="#F59E0B" opacity="0.06"/>
-        <rect x="40" y="108" width="378" height="30" fill="#F97316" opacity="0.07"/>
-        <rect x="40" y="138" width="378" height="30" fill="#EF4444" opacity="0.08"/>
-        <rect x="40" y="168" width="378" height="30" fill="#9333EA" opacity="0.09"/>
-        <!-- Zone labels -->
-        <text x="422" y="37"  font-size="7.5" fill="#10B981">Normal</text>
-        <text x="422" y="67"  font-size="7.5" fill="#84CC16">Leve</text>
-        <text x="422" y="97"  font-size="7.5" fill="#F59E0B">Moder.</text>
-        <text x="422" y="127" font-size="7.5" fill="#F97316">Mod-Sev</text>
-        <text x="422" y="157" font-size="7.5" fill="#EF4444">Severa</text>
-        <text x="422" y="187" font-size="7.5" fill="#9333EA">Profunda</text>
-        <!-- Grid and labels built by JS -->
-        <g id="agHGrid" opacity="0.4"></g>
-        <g id="agVGrid" opacity="0.4"></g>
-        <g id="agYLabels"></g>
-        <g id="agXLabels"></g>
-        <!-- Data -->
-        <g id="agLines" clip-path="url(#agClip)"></g>
-        <g id="agPoints" clip-path="url(#agClip)"></g>
-        <!-- Click zone -->
-        <rect id="agClickZone" x="40" y="18" width="378" height="180" fill="transparent"
-              onclick="agHandleClick(event)"
-              onmousemove="agHandleHover(event)"
-              onmouseleave="agHideTooltip()"/>
-        <!-- Tooltip -->
-        <g id="agTooltip" visibility="hidden">
-          <rect id="agTipBg" rx="3" fill="#0D2B4E" opacity="0.9"/>
-          <text id="agTipText" font-size="10" fill="white" font-weight="600"/>
-        </g>
-      </svg>
-
-      <!-- PTA Stats row -->
-      <div class="audiogram-stats" style="margin-top:8px;">
-        <div class="astat">
-          <span class="astat-value" id="agPtaOD" style="font-size:1.1rem;">—</span>
-          <span class="astat-label">PTA OD</span>
-        </div>
-        <div class="astat">
-          <span class="astat-value" id="agPtaOE" style="font-size:1.1rem;color:var(--cyan);">—</span>
-          <span class="astat-label">PTA OE</span>
-        </div>
-        <div class="astat">
-          <span class="astat-value" id="agClassShort" style="font-size:0.85rem;color:var(--text-muted);">Audição</span>
-          <span class="astat-label">Classificação</span>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -898,60 +922,86 @@
 </footer>
 
 <script>
-  // ── Interactive Audiogram ────────────────────────────────────────────────
+  // ── Interactive Audiogram v2 — Bilateral/Unilateral + Fitting Report ────
   (function() {
     const FREQS = [250,500,1000,2000,3000,4000,8000];
     const DBS   = [-10,0,10,20,30,40,50,60,70,80,90,100,110];
-    const P     = {l:40,r:418,t:18,b:198};
-    const pW    = P.r-P.l, pH = P.b-P.t;
-    const xSt   = pW/(FREQS.length-1);
-    const ySt   = pH/(DBS.length-1);
-    const SVG_W = 440, SVG_H = 218;
-    const SVG_NS= 'http://www.w3.org/2000/svg';
+    const P     = {l:34,r:286,t:14,b:170};
+    const pW=P.r-P.l, pH=P.b-P.t;
+    const xSt=pW/(FREQS.length-1), ySt=pH/(DBS.length-1);
+    const SVG_W=300, SVG_H=190;
+    const NS='http://www.w3.org/2000/svg';
+
+    const ZONES=[
+      {db:30,fill:'#10B981',label:'Normal'},
+      {db:40,fill:'#84CC16',label:'Leve'},
+      {db:55,fill:'#F59E0B',label:'Moderada'},
+      {db:70,fill:'#F97316',label:'Mod-Sev'},
+      {db:90,fill:'#EF4444',label:'Severa'},
+      {db:110,fill:'#9333EA',label:'Profunda'}
+    ];
 
     const st = {
-      ear:'OD', type:'VA',
-      data:{OD:{VA:{},VO:{}},OE:{VA:{},VO:{}}},
+      loss:'unilateral', aasi:'retro',
+      activeType:{OD:'VA', OE:'VA'},
+      data:{OD:{VA:{},VO:{}}, OE:{VA:{},VO:{}}},
       hist:[]
     };
 
-    function xF(i)  { return P.l + i*xSt; }
-    function yF(db) { return P.t + (db+10)/10*ySt; }
-    function snapDb(y) { return Math.round(((y-P.t)/ySt*10-10)/10)*10; }
+    function xF(i){return P.l+i*xSt;}
+    function yF(db){return P.t+(db+10)/10*ySt;}
+    function snapDb(y){return Math.round(((y-P.t)/ySt*10-10)/10)*10;}
+    function col(ear){return ear==='OD'?'#DC2626':'#2563EB';}
 
-    function col(ear){ return ear==='OD'?'#DC2626':'#2563EB'; }
+    function buildGrid(ear){
+      const suffix=ear;
+      const hg=document.getElementById('agHGrid'+suffix);
+      const vg=document.getElementById('agVGrid'+suffix);
+      const yl=document.getElementById('agYLab'+suffix);
+      const xl=document.getElementById('agXLab'+suffix);
+      const bg=document.getElementById('agBg'+suffix);
+      if(!hg)return;
 
-    function buildGrid(){
-      const hg=document.getElementById('agHGrid');
-      const vg=document.getElementById('agVGrid');
-      const yl=document.getElementById('agYLabels');
-      const xl=document.getElementById('agXLabels');
-      if(!hg) return;
+      // Background zones
+      let prevY=yF(-10);
+      ZONES.forEach(z=>{
+        const y2=yF(Math.min(z.db,110));
+        const rect=document.createElementNS(NS,'rect');
+        rect.setAttribute('x',P.l);rect.setAttribute('y',prevY);
+        rect.setAttribute('width',pW);rect.setAttribute('height',y2-prevY);
+        rect.setAttribute('fill',z.fill);rect.setAttribute('opacity','0.07');
+        bg.appendChild(rect);
+        prevY=y2;
+      });
+
       DBS.forEach(db=>{
         const y=yF(db);
-        const ln=document.createElementNS(SVG_NS,'line');
+        const ln=document.createElementNS(NS,'line');
         ln.setAttribute('x1',P.l);ln.setAttribute('x2',P.r);
         ln.setAttribute('y1',y);ln.setAttribute('y2',y);
         ln.setAttribute('stroke',db===0?'#2563EB':'#D0E4EE');
-        ln.setAttribute('stroke-width',db===0?'1.2':'0.6');
-        if(db===0)ln.setAttribute('stroke-dasharray','4 3');
+        ln.setAttribute('stroke-width',db===0?'1':'0.5');
+        if(db===0)ln.setAttribute('stroke-dasharray','3 2');
         hg.appendChild(ln);
-        const t=document.createElementNS(SVG_NS,'text');
-        t.setAttribute('x',P.l-5);t.setAttribute('y',y+3.5);
-        t.setAttribute('font-size','8.5');t.setAttribute('text-anchor','end');
-        t.setAttribute('fill','#5A7A8C');t.textContent=db;
-        yl.appendChild(t);
+        if(db!==-10){
+          const t=document.createElementNS(NS,'text');
+          t.setAttribute('x',P.l-3);t.setAttribute('y',y+3);
+          t.setAttribute('font-size','7');t.setAttribute('text-anchor','end');
+          t.setAttribute('fill','#5A7A8C');t.textContent=db;
+          yl.appendChild(t);
+        }
       });
+
       FREQS.forEach((f,i)=>{
         const x=xF(i);
-        const ln=document.createElementNS(SVG_NS,'line');
+        const ln=document.createElementNS(NS,'line');
         ln.setAttribute('x1',x);ln.setAttribute('x2',x);
         ln.setAttribute('y1',P.t);ln.setAttribute('y2',P.b);
-        ln.setAttribute('stroke','#D0E4EE');ln.setAttribute('stroke-width','0.6');
+        ln.setAttribute('stroke','#D0E4EE');ln.setAttribute('stroke-width','0.5');
         vg.appendChild(ln);
-        const t=document.createElementNS(SVG_NS,'text');
-        t.setAttribute('x',x);t.setAttribute('y',P.b+12);
-        t.setAttribute('font-size','9');t.setAttribute('text-anchor','middle');
+        const t=document.createElementNS(NS,'text');
+        t.setAttribute('x',x);t.setAttribute('y',P.b+9);
+        t.setAttribute('font-size','7.5');t.setAttribute('text-anchor','middle');
         t.setAttribute('fill','#5A7A8C');
         t.textContent=f>=1000?(f/1000)+'k':f;
         xl.appendChild(t);
@@ -961,113 +1011,79 @@
     function drawSym(g,ear,type,fi,db){
       const x=xF(fi),y=yF(db),c=col(ear);
       if(ear==='OD'&&type==='VA'){
-        const ci=document.createElementNS(SVG_NS,'circle');
-        ci.setAttribute('cx',x);ci.setAttribute('cy',y);ci.setAttribute('r','5');
-        ci.setAttribute('fill','white');ci.setAttribute('stroke',c);ci.setAttribute('stroke-width','2');
+        const ci=document.createElementNS(NS,'circle');
+        ci.setAttribute('cx',x);ci.setAttribute('cy',y);ci.setAttribute('r','4.5');
+        ci.setAttribute('fill','white');ci.setAttribute('stroke',c);ci.setAttribute('stroke-width','1.8');
         g.appendChild(ci);
       } else {
-        const sym={'OE_VA':'×','OD_VO':'<','OE_VO':'>'}[ear+'_'+type]||'×';
-        const t=document.createElementNS(SVG_NS,'text');
-        t.setAttribute('x',x);t.setAttribute('y',y+4);
-        t.setAttribute('font-size','13');t.setAttribute('font-weight','700');
+        const sym={OE_VA:'×',OD_VO:'<',OE_VO:'>'}[ear+'_'+type]||'×';
+        const t=document.createElementNS(NS,'text');
+        t.setAttribute('x',x);t.setAttribute('y',y+3.5);
+        t.setAttribute('font-size','11');t.setAttribute('font-weight','700');
         t.setAttribute('text-anchor','middle');t.setAttribute('fill',c);
         t.textContent=sym;g.appendChild(t);
       }
     }
 
-    function render(){
-      const pg=document.getElementById('agPoints');
-      const lg=document.getElementById('agLines');
-      if(!pg)return;
-      pg.innerHTML='';lg.innerHTML='';
-      ['OD','OE'].forEach(ear=>{
-        ['VA','VO'].forEach(type=>{
-          const pts=st.data[ear][type];
-          const c=col(ear);
-          const sorted=Object.keys(pts).map(Number).sort((a,b)=>a-b);
-          sorted.forEach((f,i)=>{
-            if(i<sorted.length-1){
-              const ln=document.createElementNS(SVG_NS,'line');
-              ln.setAttribute('x1',xF(FREQS.indexOf(f)));
-              ln.setAttribute('y1',yF(pts[f]));
-              ln.setAttribute('x2',xF(FREQS.indexOf(sorted[i+1])));
-              ln.setAttribute('y2',yF(pts[sorted[i+1]]));
-              ln.setAttribute('stroke',c);ln.setAttribute('stroke-width','1.8');
-              if(type==='VO')ln.setAttribute('stroke-dasharray','5 3');
-              ln.setAttribute('stroke-linecap','round');
-              lg.appendChild(ln);
-            }
-            drawSym(pg,ear,type,FREQS.indexOf(f),pts[f]);
-          });
+    function renderEar(ear){
+      const lg=document.getElementById('agLines'+ear);
+      const pg=document.getElementById('agPts'+ear);
+      if(!lg||!pg)return;
+      lg.innerHTML='';pg.innerHTML='';
+      ['VA','VO'].forEach(type=>{
+        const pts=st.data[ear][type];
+        const c=col(ear);
+        const sorted=Object.keys(pts).map(Number).sort((a,b)=>a-b);
+        sorted.forEach((f,i)=>{
+          if(i<sorted.length-1){
+            const ln=document.createElementNS(NS,'line');
+            ln.setAttribute('x1',xF(FREQS.indexOf(f)));
+            ln.setAttribute('y1',yF(pts[f]));
+            ln.setAttribute('x2',xF(FREQS.indexOf(sorted[i+1])));
+            ln.setAttribute('y2',yF(pts[sorted[i+1]]));
+            ln.setAttribute('stroke',c);ln.setAttribute('stroke-width','1.6');
+            if(type==='VO')ln.setAttribute('stroke-dasharray','4 2');
+            ln.setAttribute('stroke-linecap','round');
+            lg.appendChild(ln);
+          }
+          drawSym(pg,ear,type,FREQS.indexOf(f),pts[f]);
         });
       });
-      updatePTA();
+      updatePTA(ear);
     }
 
     function calcPTA(ear,type){
       const pts=st.data[ear][type];
-      const pf=[500,1000,2000,4000];
-      const v=pf.map(f=>pts[f]).filter(x=>x!==undefined);
+      const v=[500,1000,2000,4000].map(f=>pts[f]).filter(x=>x!==undefined);
       return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;
     }
 
-    function classify(pта){
-      if(pта===null)return null;
-      if(pта<=25)return{l:'Normal',c:'#10B981'};
-      if(pта<=40)return{l:'Leve',c:'#84CC16'};
-      if(pта<=55)return{l:'Moderada',c:'#F59E0B'};
-      if(pта<=70)return{l:'Mod-Severa',c:'#F97316'};
-      if(pта<=90)return{l:'Severa',c:'#EF4444'};
+    function classify(p){
+      if(p===null)return null;
+      if(p<=25)return{l:'Normal',c:'#10B981'};
+      if(p<=40)return{l:'Leve',c:'#84CC16'};
+      if(p<=55)return{l:'Moderada',c:'#F59E0B'};
+      if(p<=70)return{l:'Mod-Severa',c:'#F97316'};
+      if(p<=90)return{l:'Severa',c:'#EF4444'};
       return{l:'Profunda',c:'#9333EA'};
     }
 
-    function updatePTA(){
-      const od=calcPTA('OD','VA'),oe=calcPTA('OE','VA');
-      const el_od=document.getElementById('agPtaOD');
-      const el_oe=document.getElementById('agPtaOE');
-      const el_cl=document.getElementById('agClassShort');
-      const el_badge=document.getElementById('agClassBadge');
-      if(el_od) el_od.textContent=od!==null?od+' dB':'—';
-      if(el_oe) el_oe.textContent=oe!==null?oe+' dB':'—';
-      const worst=Math.max(...[od,oe].filter(x=>x!==null));
-      const cls=classify(isFinite(worst)?worst:null);
-      if(el_cl&&cls){el_cl.textContent=cls.l;el_cl.style.color=cls.c;}
-      if(el_badge){
-        if(cls){
-          el_badge.textContent=cls.l;
-          el_badge.style.color=cls.c;
-          el_badge.style.background=cls.c+'18';
-        } else {
-          el_badge.textContent='Aguardando...';
-          el_badge.style.color='#5A7A8C';
-          el_badge.style.background='var(--ice)';
-        }
-      }
+    function updatePTA(ear){
+      const pta=calcPTA(ear,'VA');
+      const cls=classify(pta);
+      const ptaEl=document.getElementById('agPta'+ear+'2');
+      const clsEl=document.getElementById('agCls'+ear);
+      if(ptaEl)ptaEl.textContent=pta!==null?pta+' dB':'—';
+      if(clsEl&&cls){clsEl.textContent=cls.l;clsEl.style.color=cls.c;}
+      else if(clsEl){clsEl.textContent='—';clsEl.style.color='var(--text-muted)';}
     }
 
-    window.agSetEar=function(ear){
-      st.ear=ear;
-      const od=document.getElementById('agBtnOD');
-      const oe=document.getElementById('agBtnOE');
-      const hint=document.getElementById('agHint');
-      if(od){od.style.background=ear==='OD'?'#DC2626':'transparent';od.style.color=ear==='OD'?'white':'var(--text-muted)';od.style.borderColor=ear==='OD'?'#DC2626':'var(--border)';}
-      if(oe){oe.style.background=ear==='OE'?'#2563EB':'transparent';oe.style.color=ear==='OE'?'white':'var(--text-muted)';oe.style.borderColor=ear==='OE'?'#2563EB':'var(--border)';}
-      if(hint)hint.style.borderLeftColor=col(ear);
-    };
-
-    window.agSetType=function(type){
-      st.type=type;
-      const va=document.getElementById('agBtnVA');
-      const vo=document.getElementById('agBtnVO');
-      if(va){va.style.background=type==='VA'?'var(--ice)':'transparent';va.style.borderColor=type==='VA'?'var(--navy)':'var(--border)';va.style.fontWeight=type==='VA'?'600':'500';va.style.color=type==='VA'?'var(--navy)':'var(--text-muted)';}
-      if(vo){vo.style.background=type==='VO'?'var(--ice)':'transparent';vo.style.borderColor=type==='VO'?'var(--navy)':'var(--border)';vo.style.fontWeight=type==='VO'?'600':'500';vo.style.color=type==='VO'?'var(--navy)':'var(--text-muted)';}
-    };
-
-    function getSVGCoords(e){
-      const svg=document.getElementById('agSVG');
+    function getSVGCoords(e,ear){
+      const svg=document.getElementById('agSVG_'+ear);
       if(!svg)return{x:0,y:0};
       const rect=svg.getBoundingClientRect();
-      return{x:(e.clientX-rect.left)*SVG_W/rect.width, y:(e.clientY-rect.top)*SVG_H/rect.height};
+      return{x:(e.clientX-rect.left)*SVG_W/rect.width,
+             y:(e.clientY-rect.top)*SVG_H/rect.height};
     }
 
     function nearestFreq(svgX){
@@ -1076,76 +1092,189 @@
       return bestD<xSt*0.6?best:-1;
     }
 
-    window.agHandleClick=function(e){
-      const{x,y}=getSVGCoords(e);
+    window.agClick=function(e,ear){
+      const{x,y}=getSVGCoords(e,ear);
       const fi=nearestFreq(x);
       if(fi<0)return;
       const db=snapDb(y);
       if(db<-10||db>110)return;
-      st.hist.push({ear:st.ear,type:st.type,freq:FREQS[fi],prev:st.data[st.ear][st.type][FREQS[fi]]});
-      st.data[st.ear][st.type][FREQS[fi]]=db;
-      render();
+      const type=st.activeType[ear];
+      st.hist.push({ear,type,freq:FREQS[fi],prev:st.data[ear][type][FREQS[fi]]});
+      st.data[ear][type][FREQS[fi]]=db;
+      renderEar(ear);
     };
 
-    window.agHandleHover=function(e){
-      const{x,y}=getSVGCoords(e);
+    window.agHover=function(e,ear){
+      const{x,y}=getSVGCoords(e,ear);
       const fi=nearestFreq(x);
       const db=snapDb(y);
-      if(fi<0||db<-10||db>110){agHideTooltip();return;}
+      if(fi<0||db<-10||db>110){agLeave(ear);return;}
       const tx=xF(fi),ty=yF(db);
-      const tt=document.getElementById('agTooltip');
-      const tb=document.getElementById('agTipBg');
-      const tt2=document.getElementById('agTipText');
+      const tt=document.getElementById('agTip'+ear);
+      const tb=document.getElementById('agTipBg'+ear);
+      const tt2=document.getElementById('agTipTxt'+ear);
       if(!tt)return;
-      const label=FREQS[fi]>=1000?(FREQS[fi]/1000)+'k Hz':FREQS[fi]+' Hz';
-      if(tt2)tt2.textContent=label+' · '+db+' dB HL';
-      let ttx=tx+7,tty=ty-16;
-      if(ttx+100>SVG_W-10)ttx=tx-107;
+      const label=FREQS[fi]>=1000?(FREQS[fi]/1000)+'k':FREQS[fi];
+      if(tt2)tt2.textContent=label+' Hz · '+db+' dB';
+      let ttx=tx+6,tty=ty-12;
+      if(ttx+80>SVG_W-5)ttx=tx-85;
       if(tty<5)tty=ty+8;
-      if(tb){tb.setAttribute('x',ttx-4);tb.setAttribute('y',tty-12);tb.setAttribute('width','108');tb.setAttribute('height','16');}
+      if(tb){tb.setAttribute('x',ttx-3);tb.setAttribute('y',tty-10);tb.setAttribute('width','82');tb.setAttribute('height','13');}
       if(tt2){tt2.setAttribute('x',ttx);tt2.setAttribute('y',tty);}
       tt.setAttribute('visibility','visible');
-      let guide=document.getElementById('agSnapGuide');
-      const svg=document.getElementById('agSVG');
+
+      const svg=document.getElementById('agSVG_'+ear);
+      let guide=document.getElementById('agGuide'+ear);
       if(!guide&&svg){
-        guide=document.createElementNS(SVG_NS,'g');
-        guide.setAttribute('id','agSnapGuide');
+        guide=document.createElementNS(NS,'g');
+        guide.setAttribute('id','agGuide'+ear);
         guide.setAttribute('pointer-events','none');
-        const cz=document.getElementById('agClickZone');
-        if(cz)svg.insertBefore(guide,cz);
+        svg.appendChild(guide);
       }
       if(guide)guide.innerHTML=
-        '<line x1="'+tx+'" y1="'+P.t+'" x2="'+tx+'" y2="'+P.b+'" stroke="'+col(st.ear)+'" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5"/>'+
-        '<line x1="'+P.l+'" y1="'+ty+'" x2="'+P.r+'" y2="'+ty+'" stroke="'+col(st.ear)+'" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5"/>'+
-        '<circle cx="'+tx+'" cy="'+ty+'" r="3.5" fill="'+col(st.ear)+'" opacity="0.25"/>';
+        '<line x1="'+tx+'" y1="'+P.t+'" x2="'+tx+'" y2="'+P.b+'" stroke="'+col(ear)+'" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.5"/>'+
+        '<line x1="'+P.l+'" y1="'+ty+'" x2="'+P.r+'" y2="'+ty+'" stroke="'+col(ear)+'" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.5"/>'+
+        '<circle cx="'+tx+'" cy="'+ty+'" r="3" fill="'+col(ear)+'" opacity="0.2"/>';
     };
 
-    window.agHideTooltip=function(){
-      const tt=document.getElementById('agTooltip');
+    window.agLeave=function(ear){
+      const tt=document.getElementById('agTip'+ear);
       if(tt)tt.setAttribute('visibility','hidden');
-      const g=document.getElementById('agSnapGuide');
+      const g=document.getElementById('agGuide'+ear);
       if(g)g.innerHTML='';
     };
 
-    window.agUndo=function(){
-      if(!st.hist.length)return;
-      const last=st.hist.pop();
-      if(last.prev===undefined)delete st.data[last.ear][last.type][last.freq];
-      else st.data[last.ear][last.type][last.freq]=last.prev;
-      render();
+    window.agSetType=function(ear,type){
+      st.activeType[ear]=type;
+      ['VA','VO'].forEach(t=>{
+        const btn=document.getElementById('ag'+ear+'_'+t);
+        if(!btn)return;
+        const isActive=t===type;
+        const c=ear==='OD'?'var(--navy)':'#2563EB';
+        const bg=ear==='OD'?'var(--ice)':'#EFF6FF';
+        btn.style.background=isActive?bg:'transparent';
+        btn.style.borderColor=isActive?c:'var(--border)';
+        btn.style.color=isActive?c:'var(--text-muted)';
+        btn.style.fontWeight=isActive?'600':'500';
+      });
     };
 
-    window.agClear=function(){
-      st.data={OD:{VA:{},VO:{}},OE:{VA:{},VO:{}}};
-      st.hist=[];
-      render();
+    window.agUndoEar=function(ear){
+      const last=[...st.hist].reverse().find(h=>h.ear===ear);
+      if(!last)return;
+      st.hist=st.hist.filter(h=>h!==last);
+      if(last.prev===undefined)delete st.data[ear][last.type][last.freq];
+      else st.data[ear][last.type][last.freq]=last.prev;
+      renderEar(ear);
     };
 
-    // init
-    buildGrid();
-    agSetEar('OD');
-    agSetType('VA');
-    render();
+    window.agClearEar=function(ear){
+      st.data[ear]={VA:{},VO:{}};
+      st.hist=st.hist.filter(h=>h.ear!==ear);
+      renderEar(ear);
+    };
+
+    window.agSelectLoss=function(loss){
+      st.loss=loss;
+      const isBi=loss==='bilateral';
+      const isIntra=st.aasi==='intra';
+
+      document.getElementById('btnUni').style.background=!isBi?'#DC2626':'transparent';
+      document.getElementById('btnUni').style.color=!isBi?'white':'var(--text-muted)';
+      document.getElementById('btnUni').style.borderColor=!isBi?'#DC2626':'var(--border)';
+      document.getElementById('btnBi').style.background=isBi?'#DC2626':'transparent';
+      document.getElementById('btnBi').style.color=isBi?'white':'var(--text-muted)';
+      document.getElementById('btnBi').style.borderColor=isBi?'#DC2626':'var(--border)';
+
+      // Intra always = 1 audiogram regardless
+      const showOE = isBi && !isIntra;
+      document.getElementById('agPanelOE').style.display=showOE?'':'none';
+    };
+
+    window.agSelectAasi=function(aasi){
+      st.aasi=aasi;
+      const isRetro=aasi==='retro';
+      document.getElementById('btnRetro').style.background=isRetro?'var(--cyan)':'transparent';
+      document.getElementById('btnRetro').style.color=isRetro?'white':'var(--text-muted)';
+      document.getElementById('btnRetro').style.borderColor=isRetro?'var(--cyan)':'var(--border)';
+      document.getElementById('btnIntra').style.background=!isRetro?'var(--cyan)':'transparent';
+      document.getElementById('btnIntra').style.color=!isRetro?'white':'var(--text-muted)';
+      document.getElementById('btnIntra').style.borderColor=!isRetro?'var(--cyan)':'var(--border)';
+
+      // Intra = always 1 audiogram (por ouvido — mas mostramos só 1 para simplificar)
+      if(!isRetro){
+        document.getElementById('agPanelOE').style.display='none';
+        // Show note
+        let note=document.getElementById('agIntraNote');
+        if(!note){
+          note=document.createElement('div');
+          note.id='agIntraNote';
+          note.style.cssText='font-size:0.65rem;color:var(--steel);padding:4px 8px;background:#EFF6FF;border-radius:6px;margin-top:6px;border-left:2px solid #2563EB;';
+          note.innerHTML='ℹ️ AASI Intra: adaptação por ouvido — selecione o lado acima';
+          document.getElementById('agWrapper').after(note);
+        }
+        note.style.display='';
+      } else {
+        const note=document.getElementById('agIntraNote');
+        if(note)note.style.display='none';
+        // Re-apply bilateral if was bilateral
+        if(st.loss==='bilateral'){
+          document.getElementById('agPanelOE').style.display='';
+        }
+      }
+    };
+
+    window.agPreviewFile=function(e){
+      const file=e.target.files[0];
+      if(!file)return;
+      const wrap=document.getElementById('agPreviewWrap');
+      const img=document.getElementById('agPreviewImg');
+      const name=document.getElementById('agFileName');
+      const label=document.getElementById('agUploadLabel');
+      if(file.type.startsWith('image/')){
+        const reader=new FileReader();
+        reader.onload=ev=>{img.src=ev.target.result;wrap.style.display='';label.style.display='none';};
+        reader.readAsDataURL(file);
+      } else {
+        // PDF — show icon
+        img.src='';
+        img.alt='';
+        wrap.style.display='';
+        img.style.display='none';
+        label.style.display='none';
+        let pdfIcon=document.getElementById('agPdfIcon');
+        if(!pdfIcon){
+          pdfIcon=document.createElement('div');
+          pdfIcon.id='agPdfIcon';
+          pdfIcon.style.cssText='text-align:center;padding:16px;background:var(--ice);border-radius:8px;border:1px solid var(--border);';
+          pdfIcon.innerHTML='📄 <span style="font-size:0.75rem;color:var(--navy);font-weight:600;">'+file.name+'</span>';
+          wrap.insertBefore(pdfIcon,img);
+        }
+        pdfIcon.style.display='';
+      }
+      if(name)name.textContent=file.name;
+    };
+
+    window.agRemoveFile=function(){
+      const wrap=document.getElementById('agPreviewWrap');
+      const img=document.getElementById('agPreviewImg');
+      const label=document.getElementById('agUploadLabel');
+      const pdfIcon=document.getElementById('agPdfIcon');
+      const input=document.getElementById('agFileInput');
+      if(wrap)wrap.style.display='none';
+      if(img){img.src='';img.style.display='';}
+      if(label)label.style.display='';
+      if(pdfIcon)pdfIcon.style.display='none';
+      if(input)input.value='';
+    };
+
+    // Init
+    buildGrid('OD');
+    buildGrid('OE');
+    renderEar('OD');
+    renderEar('OE');
+    agSelectLoss('unilateral');
+    agSelectAasi('retro');
   })();
 
   // Waitlist form
