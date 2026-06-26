@@ -301,9 +301,15 @@
       <!-- Seleção tipo de perda + AASI -->
       <div style="margin-bottom:12px;">
         <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Tipo de Perda</div>
-        <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
           <button id="btnUni" onclick="agSelectLoss('unilateral')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid #DC2626;background:#DC2626;color:white;cursor:pointer;">Unilateral</button>
           <button id="btnBi" onclick="agSelectLoss('bilateral')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Bilateral</button>
+        </div>
+        <!-- Seletor de ouvido — só aparece no Unilateral -->
+        <div id="agUniSideWrap" style="display:flex;gap:6px;margin-bottom:10px;padding:8px;background:var(--ice);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-size:0.68rem;color:var(--text-muted);font-weight:600;align-self:center;white-space:nowrap;">Ouvido afetado:</span>
+          <button id="btnUniOD" onclick="agSelectUniSide('OD')" style="flex:1;font-size:0.72rem;font-weight:600;padding:5px 8px;border-radius:6px;border:1.5px solid #DC2626;background:#DC2626;color:white;cursor:pointer;">● OD</button>
+          <button id="btnUniOE" onclick="agSelectUniSide('OE')" style="flex:1;font-size:0.72rem;font-weight:600;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">× OE</button>
         </div>
         <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Tipo de AASI</div>
         <div style="display:flex;gap:6px;">
@@ -313,7 +319,13 @@
       </div>
 
       <!-- Audiograms wrapper -->
-      <div id="agWrapper" style="display:flex;gap:10px;transition:all .3s;">
+      <div id="agWrapper" style="display:flex;gap:10px;transition:all .3s;flex-wrap:wrap;">
+
+        <!-- Seletor de lado (só aparece em Unilateral) -->
+        <div id="agUniSideWrap" style="width:100%;display:flex;gap:6px;margin-bottom:4px;">
+          <button id="btnUniOD" onclick="agSelectUniSide('OD')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid #DC2626;background:#DC2626;color:white;cursor:pointer;">● OD — Direito</button>
+          <button id="btnUniOE" onclick="agSelectUniSide('OE')" style="flex:1;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">× OE — Esquerdo</button>
+        </div>
 
         <!-- Audiograma OD -->
         <div id="agPanelOD" style="flex:1;min-width:0;">
@@ -942,7 +954,7 @@
     ];
 
     const st = {
-      loss:'unilateral', aasi:'retro',
+      loss:'unilateral', aasi:'retro', uniSide:'OD',
       activeType:{OD:'VA', OE:'VA'},
       data:{OD:{VA:{},VO:{}}, OE:{VA:{},VO:{}}},
       hist:[]
@@ -1177,8 +1189,8 @@
     window.agSelectLoss=function(loss){
       st.loss=loss;
       const isBi=loss==='bilateral';
-      const isIntra=st.aasi==='intra';
 
+      // Style Unilateral/Bilateral buttons
       document.getElementById('btnUni').style.background=!isBi?'#DC2626':'transparent';
       document.getElementById('btnUni').style.color=!isBi?'white':'var(--text-muted)';
       document.getElementById('btnUni').style.borderColor=!isBi?'#DC2626':'var(--border)';
@@ -1186,9 +1198,33 @@
       document.getElementById('btnBi').style.color=isBi?'white':'var(--text-muted)';
       document.getElementById('btnBi').style.borderColor=isBi?'#DC2626':'var(--border)';
 
-      // Intra always = 1 audiogram regardless
-      const showOE = isBi && !isIntra;
-      document.getElementById('agPanelOE').style.display=showOE?'':'none';
+      // Show/hide ouvido selector (só aparece no unilateral)
+      const sideWrap=document.getElementById('agUniSideWrap');
+      if(sideWrap)sideWrap.style.display=isBi?'none':'flex';
+
+      if(isBi){
+        // Bilateral: mostra OD + OE
+        document.getElementById('agPanelOD').style.display='';
+        document.getElementById('agPanelOE').style.display='';
+      } else {
+        // Unilateral: mostra só o ouvido selecionado (padrão OD)
+        agSelectUniSide(st.uniSide||'OD');
+      }
+    };
+
+    window.agSelectUniSide=function(side){
+      st.uniSide=side;
+      const isOD=side==='OD';
+      // Style side buttons
+      document.getElementById('btnUniOD').style.background=isOD?'#DC2626':'transparent';
+      document.getElementById('btnUniOD').style.color=isOD?'white':'var(--text-muted)';
+      document.getElementById('btnUniOD').style.borderColor=isOD?'#DC2626':'var(--border)';
+      document.getElementById('btnUniOE').style.background=!isOD?'#2563EB':'transparent';
+      document.getElementById('btnUniOE').style.color=!isOD?'white':'var(--text-muted)';
+      document.getElementById('btnUniOE').style.borderColor=!isOD?'#2563EB':'var(--border)';
+      // Show correct panel
+      document.getElementById('agPanelOD').style.display=isOD?'':'none';
+      document.getElementById('agPanelOE').style.display=!isOD?'':'none';
     };
 
     window.agSelectAasi=function(aasi){
@@ -1257,8 +1293,8 @@
     buildGrid('OE');
     renderEar('OD');
     renderEar('OE');
-    agSelectLoss('unilateral');
     agSelectAasi('retro');
+    agSelectLoss('unilateral');
   })();
 
   // Waitlist form
