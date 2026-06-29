@@ -268,8 +268,8 @@
     <li><a href="#waitlist">Lista de espera</a></li>
   </ul>
   <div class="nav-cta">
-    <a href="/api/contact?tipo=piloto" target="_blank" class="btn-ghost">Quero ser piloto</a>
-    <a href="/api/contact?tipo=lista" target="_blank" class="btn-primary">Entrar na lista ✦</a>
+    <a href="#" onclick="trackAndOpen('/api/contact?tipo=piloto','piloto','nav','');return false;" class="btn-ghost">Quero ser piloto</a>
+    <a href="#" onclick="trackAndOpen('/api/contact?tipo=lista','lista_espera','nav','');return false;" class="btn-primary">Entrar na lista ✦</a>
   </div>
 </nav>
 
@@ -284,8 +284,8 @@
       <h1>O sistema de gestão feito para quem <em>vende e adapta</em> aparelhos auditivos</h1>
       <p>Agenda, prontuário audiológico, controle de estoque de AASI, convênios e BI clínico. Tudo em uma plataforma construída por dentro do setor.</p>
       <div class="hero-actions">
-        <a href="/api/contact?tipo=lista" target="_blank" class="btn-coral">Entrar na lista de espera ✦</a>
-        <a href="/api/contact?tipo=piloto" target="_blank" class="btn-outline">🧪 Ser clínica piloto</a>
+        <a href="#" onclick="trackAndOpen('/api/contact?tipo=lista','lista_espera','hero','');return false;" class="btn-coral">Entrar na lista de espera ✦</a>
+        <a href="#" onclick="trackAndOpen('/api/contact?tipo=piloto','piloto','hero','');return false;" class="btn-outline">🧪 Ser clínica piloto</a>
       </div>
       <div class="hero-origin">
         <div class="origin-icon">👂</div>
@@ -983,7 +983,7 @@
           <li><span class="plan-check">✓</span> Suporte via chat</li>
           <li><span class="plan-check">✓</span> LGPD compliant</li>
         </ul>
-        <a href="/api/contact?tipo=lista" target="_blank" class="btn-plan">Entrar na lista de espera</a>
+        <a href="#" onclick="trackAndOpen('/api/contact?tipo=lista','lista_espera','pricing','');return false;" class="btn-plan">Entrar na lista de espera</a>
       </div>
       <div class="price-card featured">
         <div class="price-tag">Mais completo</div>
@@ -1001,7 +1001,7 @@
           <li><span class="plan-check">✓</span> Integrações (n8n, Zapier)</li>
           <li><span class="plan-check">✓</span> Suporte prioritário</li>
         </ul>
-        <a href="/api/contact?tipo=lista" target="_blank" class="btn-plan featured">Entrar na lista ✦</a>
+        <a href="#" onclick="trackAndOpen('/api/contact?tipo=lista','lista_espera','pricing_featured','');return false;" class="btn-plan featured">Entrar na lista ✦</a>
       </div>
       <div class="price-card">
         <div class="plan-name">Rede</div>
@@ -1017,7 +1017,7 @@
           <li><span class="plan-check">✓</span> Onboarding dedicado</li>
           <li><span class="plan-check">✓</span> SLA contratual</li>
         </ul>
-        <a href="/api/contact?tipo=rede" target="_blank" class="btn-plan">Falar com a equipe</a>
+        <a href="#" onclick="trackAndOpen('/api/contact?tipo=rede','rede','pricing','');return false;" class="btn-plan">Falar com a equipe</a>
       </div>
     </div>
     <p style="text-align:center;margin-top:28px;font-size:0.82rem;color:var(--text-muted);">💡 Valores de referência sujeitos a ajuste após validação com clínicas piloto. Sem taxa de setup. Sem contrato de fidelidade.</p>
@@ -1040,8 +1040,8 @@
     </div>
 
     <div class="waitlist-alts">
-      <a href="/api/contact?tipo=piloto" target="_blank" class="btn-ghost-white">🧪 Quero ser clínica piloto</a>
-      <a href="/api/contact?tipo=demo" target="_blank" class="btn-ghost-white">📅 Agendar demonstração</a>
+      <a href="#" onclick="trackAndOpen('/api/contact?tipo=piloto','piloto','waitlist','');return false;" class="btn-ghost-white">🧪 Quero ser clínica piloto</a>
+      <a href="#" onclick="trackAndOpen('/api/contact?tipo=demo','demo','waitlist','');return false;" class="btn-ghost-white">📅 Agendar demonstração</a>
     </div>
     <p class="waitlist-note">Sem spam. Você pode sair da lista a qualquer momento. Seus dados são protegidos pela LGPD.</p>
   </div>
@@ -1077,7 +1077,7 @@
           <li><a href="#">Sobre o projeto</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Clínicas piloto</a></li>
-          <li><a href="/api/contact?tipo=lista" target="_blank">Contato</a></li>
+          <li><a href="#" onclick="trackAndOpen('/api/contact?tipo=lista','lista_espera','footer','');return false;">Contato</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1463,7 +1463,24 @@
 
   // Waitlist form
   // n8n webhook — substitua pela URL do seu webhook no n8n
-  const N8N_WEBHOOK = 'https://chaps-prelaw-waged.ngrok-free.app/webhook/aurisai-leads';
+  const N8N_WEBHOOK = 'https://chaps-prelaw-waged.ngrok-free.dev/webhook/aurisai-leads';
+
+  // Função central de rastreamento — envia para n8n + abre destino
+  function trackAndOpen(url, tipo, secao, email) {
+    fetch(N8N_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email || '',
+        tipo: tipo,
+        secao: secao,
+        origem: 'landing_' + tipo,
+        data: new Date().toISOString(),
+        pagina: window.location.href
+      })
+    }).catch(() => {});
+    if (url) window.open(url, '_blank');
+  }
 
   function handleWaitlist() {
     const email = document.getElementById('emailInput').value;
@@ -1472,20 +1489,12 @@
       document.getElementById('emailInput').focus();
       return;
     }
-    // 1. Envia lead para n8n → Google Sheets (sem bloquear)
-    fetch(N8N_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email,
-        origem: 'landing_lista_espera',
-        data: new Date().toISOString(),
-        pagina: window.location.href
-      })
-    }).catch(() => {}); // falha silenciosa — não bloqueia o fluxo
-
-    // 2. Abre WhatsApp
-    window.open('/api/contact?tipo=email&email=' + encodeURIComponent(email), '_blank');
+    trackAndOpen(
+      '/api/contact?tipo=email&email=' + encodeURIComponent(email),
+      'lista_espera',
+      'secao_waitlist',
+      email
+    );
     document.querySelector('.waitlist-form').style.display = 'none';
     document.getElementById('successMsg').classList.add('show');
   }
