@@ -162,6 +162,33 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
 .plan li .d{font-weight:600;font-variant-numeric:tabular-nums}
 .dev{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
 .hist .li .t{width:84px;font-weight:500;color:var(--ink-2)}
+/* Audiograma */
+.au-lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);font-weight:700;margin:4px 0 6px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 120px;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-weight:600;cursor:pointer;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--ear-r);border-color:var(--ear-r);color:#fff}
+.seg button.oe[aria-pressed="true"]{background:var(--ear-l);border-color:var(--ear-l)}
+.seg.aasi button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#04202A}
+.au-side{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.au-side>span{font-size:12px;font-weight:600;color:var(--ink-2)}
+.au-side .seg{flex:1}
+.stack{display:flex;flex-direction:column;gap:18px}
+.au-ctl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.au-ctl{grid-template-columns:minmax(0,1fr)}}
+.ag-wrap{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;justify-content:center}
+.ag-ear{flex:1 1 300px;min-width:0;max-width:560px}
+.ag-title{text-align:center;font-size:12px;font-weight:700;letter-spacing:.08em;margin-bottom:5px}
+.ag-svg{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.ag-hit{cursor:crosshair}
+.ag-tools{display:flex;gap:4px;justify-content:center;margin-top:6px}
+.ag-tools button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--ink-2)}
+.ag-tools button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:600}
+.ag-stats{display:flex;gap:6px;margin-top:6px}
+.ag-stats div{flex:1;background:var(--surface-2);border-radius:8px;padding:6px;text-align:center}
+.ag-stats b{display:block;font-family:var(--font-display);font-size:17px;font-weight:600}
+.ag-stats span{font-size:11px;color:var(--ink-2)}
+.g-good{color:var(--good)} .g-acc{color:var(--accent-ink)} .g-warn{color:var(--warn)} .g-crit{color:var(--crit)}
+.au-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
 /* Modal */
 .ov{position:fixed;inset:0;background:rgba(5,15,28,.5);display:flex;align-items:flex-start;justify-content:center;padding:max(40px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));z-index:50;overflow-y:auto}
 .mod{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:100%;max-width:560px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
@@ -303,6 +330,14 @@ function seed(){
     {id:'e8',patient:'p8',date:'2026-09-18',type:'Audiometria tonal',by:'u4',clinic:'montijo',R:[45,50,60,70,80,85],L:[40,50,60,70,80,90]},
     {id:'e9',patient:'p4',date:'2026-10-16',type:'Audiometria tonal',by:'u6',clinic:'vfx',R:[20,25,30,45,55,60],L:[25,30,40,50,60,65]}
   ];
+  function pts(arr){var o={};[250,500,1000,2000,4000,8000].forEach(function(f,i){o[f]=arr[i];});return o;}
+  D.exams.forEach(function(e){e.loss='bilateral';e.side='OD';e.aasi='retro';e.data={OD:{VA:pts(e.R),VO:{}},OE:{VA:pts(e.L),VO:{}}};delete e.R;delete e.L;});
+  function ex_(id){return D.exams.find(function(e){return e.id===id;});}
+  ex_('e2').data.OD.VA[3000]=60;ex_('e2').data.OE.VA[3000]=65;
+  ex_('e2').data.OD.VO={500:25,1000:35,2000:50,3000:55,4000:60};ex_('e2').data.OE.VO={500:25,1000:40,2000:55,3000:60,4000:65};
+  ex_('e4').loss='unilateral';ex_('e4').side='OD';ex_('e4').aasi='intra';
+  ex_('e6').loss='unilateral';ex_('e6').side='OE';
+  D.settings={grade:'lk'};
   D.atts=[
     {id:'f1',patient:'p1',name:'Audiograma_14-10-2026.pdf',type:'Audiometria tonal',date:'2026-10-14',by:'u4',clinic:'cacem'},
     {id:'f2',patient:'p1',name:'Timpanograma_14-10-2026.png',type:'Timpanometria',date:'2026-10-14',by:'u4',clinic:'cacem'},
@@ -358,27 +393,74 @@ function warrantiesEnding(){return D.devices.filter(function(d){return inScope(P
 function inAssist(){return D.devices.filter(function(d){return d.status==='assistencia'&&inScope(Pt(d.patient).clinic);});}
 function todayAppts(cs){cs=cs||scope();return D.appts.filter(function(a){return a.date===TODAY&&cs.indexOf(a.clinic)>=0;}).sort(function(a,b){return a.time<b.time?-1:1;});}
 
-function bpta(arr){var v=(arr[1]+arr[2]+arr[3]+arr[4])/4;var l=v<=20?'Audição normal':v<=40?'Perda ligeira':v<=70?'Perda moderada':v<=90?'Perda severa':'Perda profunda';var cls=v<=20?'good':v<=40?'acc':v<=70?'warn':'crit';return {v:Math.round(v),l:l,cls:cls};}
+var AF=[250,500,1000,2000,3000,4000,8000],AFL=['250','500','1k','2k','3k','4k','8k'];
+var AG={l:34,r:288,t:12,b:178,W:300,H:198};
+var SCALES={
+  lk:{name:'Lloyd & Kaplan',freqs:[500,1000,2000],fl:'500, 1000 e 2000 Hz',
+      zones:[{db:25,c:'#10B981'},{db:40,c:'#84CC16'},{db:55,c:'#F59E0B'},{db:70,c:'#F97316'},{db:90,c:'#EF4444'},{db:120,c:'#9333EA'}],
+      steps:[[25,'Normal','good'],[40,'Leve','acc'],[55,'Moderada','warn'],[70,'Moderadamente severa','warn'],[90,'Severa','crit'],[999,'Profunda','crit']]},
+  biap:{name:'BIAP',freqs:[500,1000,2000,4000],fl:'500, 1000, 2000 e 4000 Hz',
+      zones:[{db:20,c:'#10B981'},{db:40,c:'#84CC16'},{db:70,c:'#F59E0B'},{db:90,c:'#EF4444'},{db:120,c:'#9333EA'}],
+      steps:[[20,'Audição normal','good'],[40,'Perda ligeira','acc'],[55,'Moderada 1.º grau','warn'],[70,'Moderada 2.º grau','warn'],[80,'Severa 1.º grau','crit'],[90,'Severa 2.º grau','crit'],[100,'Profunda 1.º grau','crit'],[110,'Profunda 2.º grau','crit'],[119,'Profunda 3.º grau','crit'],[999,'Cofose','crit']]}
+};
+function SC(){return SCALES[D.settings.grade]||SCALES.lk;}
+function ax(i){return AG.l+i*(AG.r-AG.l)/(AF.length-1);}
+function ay(db){return AG.t+(db+10)/130*(AG.b-AG.t);}
+function pta(e,ear){if(!e)return null;var p=e.data[ear].VA;var v=SC().freqs.map(function(f){return p[f];}).filter(function(x){return x!=null;});return v.length?Math.round(v.reduce(function(a,b){return a+b;},0)/v.length):null;}
+function grau(p){if(p==null)return null;var st=SC().steps;for(var i=0;i<st.length;i++){if(p<=st[i][0])return{l:st[i][1],c:st[i][2]};}return null;}
+function earsOf(e){return e.loss==='bilateral'?['OD','OE']:[e.side];}
+function earName(ear){return ear==='OD'?'OD · DIREITO':'OE · ESQUERDO';}
+function symbol(ear,type,x,y,c,op){
+  if(type==='VA'&&ear==='OD')return '<circle cx="'+x+'" cy="'+y+'" r="4.6" fill="var(--surface)" stroke="'+c+'" stroke-width="1.8" opacity="'+op+'"/>';
+  if(type==='VA')return '<path d="M'+(x-4.2)+' '+(y-4.2)+'L'+(x+4.2)+' '+(y+4.2)+'M'+(x-4.2)+' '+(y+4.2)+'L'+(x+4.2)+' '+(y-4.2)+'" stroke="'+c+'" stroke-width="1.9" opacity="'+op+'"/>';
+  return '<text x="'+x+'" y="'+(y+4)+'" font-size="12" font-weight="700" text-anchor="middle" fill="'+c+'" opacity="'+op+'">'+(ear==='OD'?'&lt;':'&gt;')+'</text>';
+}
+function curve(ear,type,pts,c,op){
+  var fs=Object.keys(pts).map(Number).filter(function(f){return AF.indexOf(f)>=0;}).sort(function(a,b){return a-b;});var o='';
+  if(fs.length>1)o+='<polyline points="'+fs.map(function(f){return ax(AF.indexOf(f))+','+ay(pts[f]);}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="1.6" stroke-linejoin="round"'+(type==='VO'?' stroke-dasharray="4 3"':'')+' opacity="'+op+'"/>';
+  fs.forEach(function(f){o+=symbol(ear,type,ax(AF.indexOf(f)),ay(pts[f]),c,op);});return o;
+}
+function earSvg(e,ear,prev,editable){
+  var c=ear==='OD'?'var(--ear-r)':'var(--ear-l)',w=AG.r-AG.l;
+  var s='<svg class="ag-svg" viewBox="0 0 '+AG.W+' '+AG.H+'" role="img" aria-label="Audiograma, '+(ear==='OD'?'ouvido direito':'ouvido esquerdo')+'">';
+  var y0=ay(-10);SC().zones.forEach(function(z){var y1=ay(z.db);s+='<rect x="'+AG.l+'" y="'+y0+'" width="'+w+'" height="'+(y1-y0)+'" fill="'+z.c+'" opacity="0.08"/>';y0=y1;});
+  for(var db=-10;db<=120;db+=10){var y=ay(db);s+='<line x1="'+AG.l+'" x2="'+AG.r+'" y1="'+y+'" y2="'+y+'" stroke="'+(db===0?'var(--ear-l)':'var(--line)')+'" stroke-width="'+(db===0?0.9:0.5)+'"'+(db===0?' stroke-dasharray="3 2"':'')+'/>';if(db%20===0)s+='<text x="'+(AG.l-4)+'" y="'+(y+3)+'" font-size="8" text-anchor="end" fill="var(--ink-2)">'+db+'</text>';}
+  AF.forEach(function(f,i){var x=ax(i);s+='<line x1="'+x+'" x2="'+x+'" y1="'+AG.t+'" y2="'+AG.b+'" stroke="var(--line)" stroke-width="0.5"/><text x="'+x+'" y="'+(AG.b+12)+'" font-size="8.5" text-anchor="middle" fill="var(--ink-2)">'+AFL[i]+'</text>';});
+  s+='<text x="9" y="'+((AG.t+AG.b)/2)+'" font-size="8" fill="var(--ink-2)" text-anchor="middle" transform="rotate(-90 9 '+((AG.t+AG.b)/2)+')">dB HL</text>';
+  if(prev)s+=curve(ear,'VA',prev.data[ear].VA,c,0.28);
+  s+=curve(ear,'VO',e.data[ear].VO,c,1)+curve(ear,'VA',e.data[ear].VA,c,1);
+  s+='<g class="ag-guide" pointer-events="none"></g>';
+  if(editable)s+='<rect class="ag-hit" data-a="au-plot" data-ear="'+ear+'" x="'+AG.l+'" y="'+AG.t+'" width="'+w+'" height="'+(AG.b-AG.t)+'" fill="transparent"/>';
+  return s+'</svg>';
+}
+function auPanel(e,prev,editable){
+  var h='';
+  if(editable){
+    h+='<div class="au-ctl"><div><div class="au-lab">Tipo de perda</div><div class="seg"><button data-a="au-loss" data-v="unilateral" aria-pressed="'+(e.loss==='unilateral')+'">Unilateral</button><button data-a="au-loss" data-v="bilateral" aria-pressed="'+(e.loss==='bilateral')+'">Bilateral</button></div>';
+    if(e.loss==='unilateral')h+='<div class="au-side"><span>Ouvido afetado</span><div class="seg"><button data-a="au-side" data-v="OD" aria-pressed="'+(e.side==='OD')+'">● OD</button><button class="oe" data-a="au-side" data-v="OE" aria-pressed="'+(e.side==='OE')+'">× OE</button></div></div>';
+    h+='</div><div><div class="au-lab">Tipo de AASI</div><div class="seg aasi"><button data-a="au-aasi" data-v="retro" aria-pressed="'+(e.aasi==='retro')+'">Retro (BTE/RIC)</button><button data-a="au-aasi" data-v="intra" aria-pressed="'+(e.aasi==='intra')+'">Intra (ITE/CIC)</button></div></div></div>';
+  }else{
+    h+='<div class="au-meta"><span class="pill">'+(e.loss==='bilateral'?'Perda bilateral':'Perda unilateral · '+(e.side==='OD'?'OD':'OE'))+'</span><span class="pill">AASI '+(e.aasi==='retro'?'retro (BTE/RIC)':'intra (ITE/CIC)')+'</span><span class="small muted">só consulta</span></div>';
+  }
+  h+='<div class="ag-wrap">';
+  earsOf(e).forEach(function(ear){
+    var p=pta(e,ear),g=grau(p),t=(S.auType&&S.auType[ear])||'VA';
+    h+='<div class="ag-ear"><div class="ag-title '+(ear==='OD'?'ear-r':'ear-l')+'">'+(ear==='OD'?'● ':'× ')+earName(ear)+'</div>'+earSvg(e,ear,prev,editable);
+    if(editable)h+='<div class="ag-tools"><button data-a="au-type" data-ear="'+ear+'" data-v="VA" aria-pressed="'+(t==='VA')+'" title="Via aérea">VA</button><button data-a="au-type" data-ear="'+ear+'" data-v="VO" aria-pressed="'+(t==='VO')+'" title="Via óssea">VO</button><button data-a="au-undo" data-ear="'+ear+'" title="Desfazer o último ponto" aria-label="Desfazer">↩</button><button data-a="au-clear" data-ear="'+ear+'" title="Limpar este ouvido" aria-label="Limpar">✕</button></div>';
+    h+='<div class="ag-stats"><div><b class="tnum '+(ear==='OD'?'ear-r':'ear-l')+'">'+(p==null?'—':p+' dB')+'</b><span>PTA '+ear+'</span></div><div><b class="'+(g?'g-'+g.c:'muted')+'" style="font-size:14px">'+(g?g.l:'—')+'</b><span>Grau · '+SC().name+'</span></div></div></div>';
+  });
+  h+='</div><div class="hint" style="margin-top:10px">'+(editable?'Clique no gráfico para marcar o limiar (passos de 5 dB). VA é via aérea, VO via óssea. ':'')+'PTA: média de '+SC().fl+' por via aérea · classificação '+SC().name+(me().role==='gestor'?' (alterável em Equipa e rede › Configurações)':'')+'.'+(prev?' A linha clara é a audiometria anterior, de '+F(prev.date)+'.':'')+'</div>';
+  return h;
+}
+function curExam(){return D.exams.find(function(x){return x.id===S.examSel;});}
+function prevOf(e){var ex=examsOf(e.patient);return S.compare?ex[ex.indexOf(e)+1]:null;}
+function renderAudio(){var el=document.getElementById('auArea'),e=curExam();if(!el||!e)return;el.innerHTML=auPanel(e,prevOf(e),canClinical()&&e.date===TODAY);}
 
 /* ---------- componentes ---------- */
 function clTag(c){return '<span class="cl">'+esc(C(c).short)+'</span>';}
 function stPill(s){return '<span class="pill '+(STPILL[s]||'')+'">'+STATUS[s]+'</span>';}
 function initials(n){var a=n.split(' ');return (a[0][0]+(a[a.length-1][0]||'')).toUpperCase();}
 
-function audiogram(ex,prev){
-  var W=440,H=300,l=44,r=14,t=14,b=30,iw=W-l-r,ih=H-t-b;
-  function X(i){return l+i*iw/5;} function Y(db){return t+(db+10)/130*ih;}
-  var s='<svg class="audio-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Audiograma tonal de '+F(ex.date)+'">';
-  s+='<rect x="'+l+'" y="'+Y(-10)+'" width="'+iw+'" height="'+(Y(20)-Y(-10))+'" fill="var(--good-soft)" opacity=".7"/>';
-  for(var db=-10;db<=120;db+=10){s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+Y(db)+'" y2="'+Y(db)+'" stroke="var(--line)" stroke-width="'+(db%20===0?1:.5)+'"/>';if(db%20===0)s+='<text x="'+(l-8)+'" y="'+(Y(db)+4)+'" font-size="11" text-anchor="end" fill="var(--ink-2)">'+db+'</text>';}
-  for(var i=0;i<6;i++){s+='<line x1="'+X(i)+'" x2="'+X(i)+'" y1="'+t+'" y2="'+(H-b)+'" stroke="var(--line)" stroke-width=".5"/><text x="'+X(i)+'" y="'+(H-b+18)+'" font-size="11" text-anchor="middle" fill="var(--ink-2)">'+FREQL[i]+'</text>';}
-  s+='<text x="'+(l+4)+'" y="'+(Y(20)-5)+'" font-size="10" fill="var(--good)">normal</text>';
-  s+='<text x="12" y="'+(t+ih/2)+'" font-size="10.5" fill="var(--ink-2)" transform="rotate(-90 12 '+(t+ih/2)+')" text-anchor="middle">dB HL</text>';
-  function series(arr,ear,op,dash){var c=ear==='R'?'var(--ear-r)':'var(--ear-l)';var pts=arr.map(function(v,i){return X(i)+','+Y(v);}).join(' ');var o='<g opacity="'+op+'"><polyline points="'+pts+'" fill="none" stroke="'+c+'" stroke-width="1.6"'+(dash?' stroke-dasharray="5 4"':'')+'/>';arr.forEach(function(v,i){var x=X(i),y=Y(v);o+=ear==='R'?'<circle cx="'+x+'" cy="'+y+'" r="5" fill="var(--surface)" stroke="'+c+'" stroke-width="1.8"/>':'<path d="M'+(x-4.5)+' '+(y-4.5)+'L'+(x+4.5)+' '+(y+4.5)+'M'+(x-4.5)+' '+(y+4.5)+'L'+(x+4.5)+' '+(y-4.5)+'" stroke="'+c+'" stroke-width="1.9"/>';});return o+'</g>';}
-  if(prev){s+=series(prev.R,'R',.28,false)+series(prev.L,'L',.28,true);}
-  s+=series(ex.R,'R',1,false)+series(ex.L,'L',1,true);
-  return s+'</svg>';
-}
 
 /* ---------- vistas ---------- */
 function vInicio(){
@@ -453,7 +535,7 @@ function vFicha(){
     h+='<div class="grid2"><div class="card"><div class="hd"><h2>Dados do paciente</h2></div><div class="bd"><dl class="kv">'+
       '<dt>Data de nascimento</dt><dd class="tnum">'+F(p.birth)+'</dd><dt>Telemóvel</dt><dd class="tnum">'+esc(p.phone)+'</dd><dt>Email</dt><dd>'+esc(p.email)+'</dd><dt>N.º utente SNS</dt><dd class="tnum">'+esc(p.sns)+'</dd><dt>Subsistema</dt><dd>'+esc(p.sub)+(p.subNum?' · <span class="tnum">'+esc(p.subNum)+'</span>':'')+'</dd><dt>Como nos conheceu</dt><dd>'+esc(p.origin)+'</dd><dt>Consentimento RGPD</dt><dd>'+(p.rgpd?'<span class="pill good">Assinado</span>':'<span class="pill crit">Em falta</span>')+'</dd></dl></div></div>';
     h+='<div style="display:flex;flex-direction:column;gap:18px;min-width:0"><div class="card"><div class="hd"><h2>Próxima marcação</h2></div><div class="bd">'+(na?'<div class="li" style="padding:0"><div class="m"><b>'+FL(na.date)+', '+na.time+'</b><div class="small muted">'+TYPES[na.type].l+' · '+esc(U(na.prof).name)+'</div></div>'+clTag(na.clinic)+stPill(na.status)+'</div>':'<div class="empty" style="padding:0">Sem marcações futuras.</div>')+'</div></div>';
-    if(ex.length){var b=[bpta(ex[0].R),bpta(ex[0].L)];h+='<div class="card"><div class="hd"><h2>Última audiometria</h2><span class="note">'+F(ex[0].date)+'</span><div class="r"><button class="btn sm ghost" data-a="tab" data-t="exames">Ver audiograma</button></div></div><div class="bd" style="display:flex;flex-direction:column;gap:6px"><div><span class="ear-r">OD</span> '+b[0].l+' <span class="muted tnum">· média '+b[0].v+' dB</span></div><div><span class="ear-l">OE</span> '+b[1].l+' <span class="muted tnum">· média '+b[1].v+' dB</span></div></div></div>';}
+    if(ex.length){var e0=ex[0];h+='<div class="card"><div class="hd"><h2>Última audiometria</h2><span class="note">'+F(e0.date)+' · '+(e0.loss==='bilateral'?'bilateral':'unilateral')+'</span><div class="r"><button class="btn sm ghost" data-a="tab" data-t="exames">Ver audiograma</button></div></div><div class="bd" style="display:flex;flex-direction:column;gap:6px">'+earsOf(e0).map(function(ear){var p=pta(e0,ear),g=grau(p);return '<div><span class="'+(ear==='OD'?'ear-r':'ear-l')+'">'+ear+'</span> '+(g?g.l:'sem dados')+(p!=null?' <span class="muted tnum">· PTA '+p+' dB</span>':'')+'</div>';}).join('')+'</div></div>';}
     if(dv.length){var d=dv[0];h+='<div class="card"><div class="hd"><h2>Aparelho</h2><div class="r"><button class="btn sm ghost" data-a="tab" data-t="aparelhos">Ver plano</button></div></div><div class="bd">'+esc(d.brand+' · '+d.model+' · '+d.ear)+'<div class="small muted">Adaptado a '+F(d.fitted)+' · garantia até '+F(d.wEnd)+'</div></div></div>';}
     h+='</div></div>';
   }
@@ -464,20 +546,16 @@ function vFicha(){
 }
 
 function fichaExames(p,ex){
-  var h='<div class="grid2"><div class="card"><div class="hd"><h2>Audiograma tonal</h2>';
+  var h='<div class="stack"><div class="card"><div class="hd"><h2>Audiometria tonal</h2>';
   if(ex.length){if(!S.examSel||!ex.some(function(e){return e.id===S.examSel;}))S.examSel=ex[0].id;
     h+='<select id="examSel" class="btn sm" aria-label="Escolher audiometria">'+ex.map(function(e){return '<option value="'+e.id+'"'+(e.id===S.examSel?' selected':'')+'>'+F(e.date)+' · '+esc(U(e.by).name)+'</option>';}).join('')+'</select>';}
   h+='<div class="r">'+(canClinical()?'<button class="btn sm" data-a="new-audio">+ Nova audiometria</button>':'')+'</div></div><div class="bd">';
-  if(!ex.length){h+='<div class="empty">Ainda sem audiometrias. '+(canClinical()?'Clique em + Nova audiometria para registar os limiares.':'O audiologista regista os limiares na consulta.')+'</div>';}
+  if(!ex.length){h+='<div class="empty">Ainda sem audiometrias. '+(canClinical()?'Clique em + Nova audiometria e marque os limiares no gráfico.':'O audiologista regista os limiares na consulta.')+'</div>';}
   else{
-    var e=ex.find(function(x){return x.id===S.examSel;}),idx=ex.indexOf(e),prev=ex[idx+1];
-    var editable=canClinical()&&e.date===TODAY;
-    h+='<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:12.5px;margin-bottom:6px"><span><span class="ear-r">○</span> Ouvido direito</span><span><span class="ear-l">✕</span> Ouvido esquerdo</span>'+(prev?'<label class="check" style="margin-left:auto"><input type="checkbox" id="cmp"'+(S.compare?' checked':'')+'> Comparar com '+F(prev.date)+'</label>':'')+'</div>';
-    h+='<div id="audioSvg">'+audiogram(e,S.compare?prev:null)+'</div>';
-    h+='<div id="audioClass" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px">'+classHTML(e)+'</div>';
-    h+='<div class="tbl"><table class="thr"><thead><tr><th>Hz</th>'+FREQL.map(function(f){return '<th>'+f+'</th>';}).join('')+'</tr></thead><tbody>';
-    ['R','L'].forEach(function(ear){h+='<tr><td class="'+(ear==='R'?'ear-r':'ear-l')+'">'+(ear==='R'?'OD':'OE')+'</td>'+e[ear].map(function(v,i){return '<td><input type="number" class="tnum" min="-10" max="120" step="5" id="th-'+ear+'-'+i+'" data-ear="'+ear+'" data-i="'+i+'" value="'+v+'"'+(editable?'':' disabled')+' aria-label="'+(ear==='R'?'Direito':'Esquerdo')+' '+FREQL[i]+' Hz"></td>';}).join('')+'</tr>';});
-    h+='</tbody></table></div><div class="hint" style="margin-top:6px">'+(editable?'Altere os limiares: o audiograma redesenha-se e a classificação é recalculada.':'Audiometrias de dias anteriores ficam só para consulta.')+' Classificação BIAP, média de 500, 1000, 2000 e 4000 Hz.</div>';
+    var e=curExam(),idx=ex.indexOf(e),prev=ex[idx+1];
+    if(prev)h+='<label class="check" style="justify-content:flex-end;margin-bottom:8px"><input type="checkbox" id="cmp"'+(S.compare?' checked':'')+'> Comparar com '+F(prev.date)+'</label>';
+    h+='<div id="auArea">'+auPanel(e,S.compare?prev:null,canClinical()&&e.date===TODAY)+'</div>';
+    if(!(canClinical()&&e.date===TODAY))h+='<div class="hint" style="margin-top:6px">'+(canClinical()?'Audiometrias de dias anteriores ficam só para consulta. Para registar, use + Nova audiometria.':'A receção consulta as audiometrias mas não as altera.')+'</div>';
   }
   h+='</div></div>';
   var at=D.atts.filter(function(a){return a.patient===p.id;}).sort(function(a,b){return a.date<b.date?1:-1;});
@@ -489,7 +567,6 @@ function fichaExames(p,ex){
   h+='<div class="hint">No protótipo o ficheiro fica só neste navegador e desaparece ao recarregar.</div></div></div></div>';
   return h;
 }
-function classHTML(e){var r=bpta(e.R),l=bpta(e.L);return '<span class="pill '+r.cls+'"><span class="ear-r">OD</span> '+r.l+' · '+r.v+' dB</span><span class="pill '+l.cls+'"><span class="ear-l">OE</span> '+l.l+' · '+l.v+' dB</span>';}
 
 function fichaAparelhos(p,dv){
   var h='<div style="display:flex;justify-content:flex-end"><button class="btn pri" data-a="new-dev">+ Registar aparelho</button></div>';
@@ -538,7 +615,15 @@ function vPosvenda(){
 
 function vEquipa(){
   var h='<div class="ph"><div><h1>Equipa e rede</h1><div class="sub">Clínicas, utilizadores e acessos · só visível para o gestor da rede</div></div><div class="act"><button class="btn pri" data-a="invite">+ Convidar utilizador</button></div></div>';
-  h+='<div class="chips"><button class="chip" data-a="eq-tab" data-t="users" aria-pressed="'+(S.equipaTab==='users')+'">Utilizadores ('+D.users.length+')</button><button class="chip" data-a="eq-tab" data-t="clinics" aria-pressed="'+(S.equipaTab==='clinics')+'">Clínicas ('+D.clinics.length+')</button></div>';
+  h+='<div class="chips"><button class="chip" data-a="eq-tab" data-t="users" aria-pressed="'+(S.equipaTab==='users')+'">Utilizadores ('+D.users.length+')</button><button class="chip" data-a="eq-tab" data-t="clinics" aria-pressed="'+(S.equipaTab==='clinics')+'">Clínicas ('+D.clinics.length+')</button><button class="chip" data-a="eq-tab" data-t="config" aria-pressed="'+(S.equipaTab==='config')+'">Configurações</button></div>';
+  if(S.equipaTab==='config'){
+    h+='<div class="card"><div class="hd"><h2>Classificação do grau de perda auditiva</h2><span class="note">vale para todas as audiometrias da rede</span></div><div class="bd" style="display:flex;flex-direction:column;gap:10px">';
+    [['lk','Lloyd & Kaplan','Média de 500, 1000 e 2000 Hz. Normal até 25 dB, Leve, Moderada, Moderadamente severa, Severa e Profunda.'],
+     ['biap','BIAP (Bureau International d\'Audiophonologie)','Média de 500, 1000, 2000 e 4000 Hz. Normal até 20 dB, Ligeira, Moderada, Severa e Profunda subdivididas em graus, e Cofose. Muito usada na Europa.']].forEach(function(o){
+      h+='<label class="att" style="cursor:pointer;align-items:flex-start"><input type="radio" name="grade" value="'+o[0]+'"'+(D.settings.grade===o[0]?' checked':'')+' style="margin-top:3px"><div class="m"><b>'+o[1]+'</b><div class="small muted" style="white-space:normal">'+o[2]+'</div></div>'+(D.settings.grade===o[0]?'<span class="pill good">Em uso</span>':'')+'</label>';});
+    h+='<div class="hint">A escolha muda o PTA, o grau e as faixas de cor do audiograma. Os limiares registados não mudam.</div></div></div>';
+    return h;
+  }
   if(S.equipaTab==='clinics'){
     h+='<div class="grid3">'+D.clinics.map(function(c){return '<div class="card"><div class="hd"><h2>'+esc(c.name)+'</h2></div><div class="bd"><dl class="kv" style="grid-template-columns:110px minmax(0,1fr)"><dt>Registo ERS</dt><dd class="tnum">'+c.ers+'</dd><dt>Morada</dt><dd>'+esc(c.addr)+'</dd><dt>Horário</dt><dd class="tnum">09:00 a 13:00 e 14:00 a 19:00</dd><dt>Equipa</dt><dd>'+staffFor(c.id).map(function(u){return esc(u.name);}).join(', ')+'</dd><dt>Pacientes</dt><dd class="tnum">'+D.patients.filter(function(p){return p.clinic===c.id;}).length+' com esta clínica principal</dd></dl></div></div>';}).join('')+'</div>';
   }else{
@@ -673,7 +758,7 @@ document.addEventListener('click',function(ev){
   else if(a==='day'){var n=+ds.n;S.date=n===0?TODAY:addD(S.date,n);render();}
   else if(a==='ag-clinic'){S.agClinic=ds.c;render();}
   else if(a==='new-audio'){var p=Pt(S.patient),ex=examsOf(p.id);var existing=ex.find(function(e){return e.date===TODAY;});if(existing){S.examSel=existing.id;toast('Já existe uma audiometria de hoje, aberta para edição.');render();return;}
-    var base=ex[0]||{R:[20,20,20,20,20,20],L:[20,20,20,20,20,20]};var u=me();var e={id:uid('e'),patient:p.id,date:TODAY,type:'Audiometria tonal',by:u.id,clinic:S.clinic==='all'?p.clinic:S.clinic,R:base.R.slice(),L:base.L.slice()};D.exams.push(e);S.examSel=e.id;toast('Nova audiometria de hoje criada a partir da anterior. Ajuste os limiares.');render();}
+    var last=ex[0];var u=me();var e={id:uid('e'),patient:p.id,date:TODAY,type:'Audiometria tonal',by:u.id,clinic:S.clinic==='all'?p.clinic:S.clinic,loss:last?last.loss:'bilateral',side:last?last.side:'OD',aasi:last?last.aasi:'retro',data:{OD:{VA:{},VO:{}},OE:{VA:{},VO:{}}}};D.exams.push(e);S.examSel=e.id;S.auHist=[];S.auType={OD:'VA',OE:'VA'};toast('Nova audiometria de hoje. Clique no gráfico para marcar os limiares.');render();}
   else if(a==='att-save'){var t=document.getElementById('attType').value;var p2=Pt(S.patient);D.atts.push({id:uid('f'),patient:p2.id,name:S.pending.name,type:t,date:TODAY,by:S.user,clinic:S.clinic==='all'?p2.clinic:S.clinic,url:S.pending.url});S.pending=null;toast('Documento anexado à ficha.');render();}
   else if(a==='att-cancel'){S.pending=null;render();}
   else if(a==='view-att'){S.modal={k:'att',id:ds.id};render();}
@@ -681,6 +766,11 @@ document.addEventListener('click',function(ev){
   else if(a==='dev-assist'){S.modal={k:'assist',id:ds.id};render();}
   else if(a==='dev-return'){var d=D.devices.find(function(x){return x.id===ds.id;});d.status='ativo';d.events.push({date:TODAY,text:'Regressou da assistência ('+d.assist.reason+')'});d.assist=null;toast('Regresso registado. O aparelho volta a "Em uso".');render();}
   else if(a==='plan-book'){var d2=D.devices.find(function(x){return x.id===ds.d;});var it=d2.plan[+ds.i];var pp=Pt(d2.patient);openAppt({patient:pp.id,type:'rev',clinic:allowed().indexOf(pp.clinic)>=0?pp.clinic:allowed()[0],date:it.date>TODAY?it.date:TODAY,planRef:{d:d2.id,i:+ds.i}});}
+  else if(a==='au-loss'||a==='au-side'||a==='au-aasi'){var e=curExam();e[{'au-loss':'loss','au-side':'side','au-aasi':'aasi'}[a]]=ds.v;renderAudio();}
+  else if(a==='au-type'){S.auType=S.auType||{OD:'VA',OE:'VA'};S.auType[ds.ear]=ds.v;renderAudio();}
+  else if(a==='au-undo'){var e=curExam();S.auHist=S.auHist||[];for(var k=S.auHist.length-1;k>=0;k--){var hh=S.auHist[k];if(hh.ex===e.id&&hh.ear===ds.ear){if(hh.prev==null)delete e.data[hh.ear][hh.type][hh.f];else e.data[hh.ear][hh.type][hh.f]=hh.prev;S.auHist.splice(k,1);break;}}renderAudio();}
+  else if(a==='au-clear'){var e=curExam();e.data[ds.ear]={VA:{},VO:{}};S.auHist=(S.auHist||[]).filter(function(x){return !(x.ex===e.id&&x.ear===ds.ear);});renderAudio();}
+  else if(a==='au-plot'){var e=curExam(),hit=auHit(ev,el);if(!hit)return;var ty=(S.auType&&S.auType[ds.ear])||'VA';S.auHist=S.auHist||[];S.auHist.push({ex:e.id,ear:ds.ear,type:ty,f:hit.f,prev:e.data[ds.ear][ty][hit.f]});e.data[ds.ear][ty][hit.f]=hit.db;renderAudio();}
   else if(a==='invite'){S.modal={k:'invite'};render();}
   else if(a==='eq-tab'){S.equipaTab=ds.t;render();}
 });
@@ -688,7 +778,8 @@ document.addEventListener('change',function(ev){
   var t=ev.target;
   if(t.id==='clinicSel'){S.clinic=t.value;if(S.clinic!=='all')S.agClinic=S.clinic;render();}
   else if(t.id==='userSel'){S.user=t.value;var u=me();S.clinic=u.role==='gestor'?'all':u.clinics[0];S.agClinic=S.clinic==='all'?'cacem':S.clinic;S.modal=null;toast('A ver como '+u.name+' ('+ROLES[u.role]+').');render();}
-  else if(t.id==='examSel'){S.examSel=t.value;render();}
+  else if(t.name==='grade'){D.settings.grade=t.value;toast('Classificação alterada para '+SC().name+'. Aplica-se a todas as audiometrias da rede.');render();}
+  else if(t.id==='examSel'){S.examSel=t.value;S.auHist=[];render();}
   else if(t.id==='cmp'){S.compare=t.checked;render();}
   else if(S.modal&&S.modal.k==='appt'&&/^m-(ty|c|pr|d)$/.test(t.id)){readAppt();render();}
   else if(t.id==='fileIn'&&t.files&&t.files[0]){takeFile(t.files[0]);}
@@ -696,8 +787,6 @@ document.addEventListener('change',function(ev){
 document.addEventListener('input',function(ev){
   var t=ev.target;
   if(t.id==='q'){S.search=t.value;var pos=t.selectionStart;render();var q=document.getElementById('q');if(q){q.focus();try{q.setSelectionRange(pos,pos);}catch(e){}}}
-  else if(t.dataset&&t.dataset.ear){var e=D.exams.find(function(x){return x.id===S.examSel;});var v=parseInt(t.value,10);if(isNaN(v))return;v=Math.max(-10,Math.min(120,v));e[t.dataset.ear][+t.dataset.i]=v;
-    var ex=examsOf(e.patient),prev=ex[ex.indexOf(e)+1];document.getElementById('audioSvg').innerHTML=audiogram(e,S.compare?prev:null);document.getElementById('audioClass').innerHTML=classHTML(e);}
 });
 document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&S.modal){S.modal=null;render();}});
 document.addEventListener('submit',function(ev){
@@ -719,6 +808,22 @@ document.addEventListener('submit',function(ev){
   else if(f==='invite'){var cs=[].slice.call(document.querySelectorAll('input[name="i-c"]:checked')).map(function(x){return x.value;});var r=g('i-r');if(r!=='gestor'&&!cs.length){toast('Escolha pelo menos uma clínica.');return;}
     D.users.push({id:uid('u'),name:g('i-n'),role:r,clinics:r==='gestor'?D.clinics.map(function(c){return c.id;}):cs,email:g('i-e'),st:'Convite enviado'});S.modal=null;S.equipaTab='users';toast('Convite enviado para '+g('i-e')+'.');render();}
 });
+function auHit(ev,rect){
+  var svg=rect.ownerSVGElement,b=svg.getBoundingClientRect();
+  var x=(ev.clientX-b.left)*AG.W/b.width,y=(ev.clientY-b.top)*AG.H/b.height;
+  var step=(AG.r-AG.l)/(AF.length-1),fi=Math.round((x-AG.l)/step);
+  if(fi<0||fi>=AF.length||Math.abs(x-ax(fi))>step*0.6)return null;
+  var db=Math.round(((y-AG.t)/(AG.b-AG.t)*130-10)/5)*5;db=Math.max(-10,Math.min(120,db));
+  return {fi:fi,f:AF[fi],db:db};
+}
+document.addEventListener('mousemove',function(ev){
+  var t=ev.target;if(!(t.classList&&t.classList.contains('ag-hit')))return;
+  var h=auHit(ev,t),g=t.ownerSVGElement.querySelector('.ag-guide');if(!g)return;
+  if(!h){g.innerHTML='';return;}
+  var c=t.dataset.ear==='OD'?'var(--ear-r)':'var(--ear-l)',x=ax(h.fi),y=ay(h.db),lab=AFL[h.fi]+' Hz · '+h.db+' dB',tx=x+8,ty=y-10;if(tx+80>AG.W)tx=x-88;if(ty<16)ty=y+18;
+  g.innerHTML='<line x1="'+x+'" x2="'+x+'" y1="'+AG.t+'" y2="'+AG.b+'" stroke="'+c+'" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.6"/><line x1="'+AG.l+'" x2="'+AG.r+'" y1="'+y+'" y2="'+y+'" stroke="'+c+'" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.6"/><circle cx="'+x+'" cy="'+y+'" r="3.5" fill="'+c+'" opacity="0.35"/><rect x="'+(tx-4)+'" y="'+(ty-10)+'" width="80" height="14" rx="3" fill="var(--navy)" opacity="0.92"/><text x="'+tx+'" y="'+ty+'" font-size="8.5" font-weight="600" fill="var(--navy-ink)">'+lab+'</text>';
+});
+document.addEventListener('mouseout',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('ag-hit')){var g=t.ownerSVGElement.querySelector('.ag-guide');if(g)g.innerHTML='';}});
 function takeFile(file){
   if(!/\.(pdf|png|jpe?g)$/i.test(file.name)){toast('Use um PDF, JPG ou PNG.');return;}
   var url=null;try{url=URL.createObjectURL(file);}catch(e){}
