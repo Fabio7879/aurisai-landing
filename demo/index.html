@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>html{color-scheme:light dark}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>AurisAI · Demonstração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap">
+<style>
+/* Layout: app shell. Faixa de protótipo, barra de topo com clínica e perfil, menu lateral, área de trabalho. */
+:root{
+  --bg:#F4F7FA; --surface:#FFFFFF; --surface-2:#EAF2F7; --ink:#0D2B4E; --ink-2:#4F6B80;
+  --line:#D3E3EC; --accent:#00A8CC; --accent-ink:#006F88; --accent-soft:#DDF3F8;
+  --navy:#0D2B4E; --navy-ink:#FFFFFF; --coral:#E8602C;
+  --good:#1E8A5A; --good-soft:#DCF2E7; --warn:#B36B00; --warn-soft:#FBEBD0; --crit:#C23A3A; --crit-soft:#F8DEDE;
+  --ear-r:#D23B3B; --ear-l:#1F6FD1;
+  --font-display:'Outfit',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'DM Sans',ui-sans-serif,system-ui,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A1726; --surface:#0F2236; --surface-2:#15304A; --ink:#E4EEF6; --ink-2:#9DB4C6;
+  --line:#22405C; --accent:#2EC4E4; --accent-ink:#7FDCF0; --accent-soft:#123B4E;
+  --navy:#06111D; --navy-ink:#E4EEF6; --coral:#FF8A5C;
+  --good:#4CC48C; --good-soft:#123A2A; --warn:#F0B04A; --warn-soft:#3A2C12; --crit:#F07070; --crit-soft:#3E1A1C;
+  --ear-r:#FF6B6B; --ear-l:#5AA2FF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1726; --surface:#0F2236; --surface-2:#15304A; --ink:#E4EEF6; --ink-2:#9DB4C6;
+  --line:#22405C; --accent:#2EC4E4; --accent-ink:#7FDCF0; --accent-soft:#123B4E;
+  --navy:#06111D; --navy-ink:#E4EEF6; --coral:#FF8A5C;
+  --good:#4CC48C; --good-soft:#123A2A; --warn:#F0B04A; --warn-soft:#3A2C12; --crit:#F07070; --crit-soft:#3E1A1C;
+  --ear-r:#FF6B6B; --ear-l:#5AA2FF; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.tnum{font-variant-numeric:tabular-nums}
+.app{min-height:100%;display:flex;flex-direction:column}
+.proto{background:#C9501C;color:#fff;font-size:12.5px;padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.proto b{font-weight:600}
+.proto button{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.7);color:#fff;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:12px}
+.top{background:var(--navy);color:var(--navy-ink);display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.logo{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(0,168,204,.25)}
+.logo small{font-family:var(--font-body);font-weight:400;font-size:12px;opacity:.7;letter-spacing:0}
+.top .sp{flex:1}
+.ctl{display:flex;align-items:center;gap:6px;font-size:12px}
+.ctl label{opacity:.75}
+.ctl select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 8px;color:var(--navy-ink);max-width:220px}
+.ctl select option{color:#0D2B4E;background:#fff}
+.body{flex:1;display:flex;min-height:0}
+nav.side{width:206px;flex:none;background:var(--surface);border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+nav.side button{display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink-2);font-weight:500}
+nav.side button:hover{background:var(--surface-2);color:var(--ink)}
+nav.side button[aria-current="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+nav.side .n{margin-left:auto;font-size:11px;background:var(--coral);color:#fff;border-radius:10px;padding:0 7px;font-weight:600}
+nav.side .who{margin-top:auto;font-size:12px;color:var(--ink-2);padding:10px 12px;border-top:1px solid var(--line)}
+main{flex:1;min-width:0;padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:1120px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.ph{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.ph h1{font-size:26px;font-weight:600}
+.ph .sub{color:var(--ink-2);font-size:13px;margin-top:2px}
+.ph .act{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#04202A;font-weight:600}
+.btn.pri:hover{filter:brightness(1.05)}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.card .hd{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card .hd h2{font-size:15px;font-weight:600}
+.card .hd .note{color:var(--ink-2);font-size:12px}
+.card .hd .r{margin-left:auto;display:flex;gap:6px}
+.card .bd{padding:14px 16px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px;text-align:left;cursor:pointer}
+.stat:hover{border-color:var(--accent)}
+.stat .v{font-family:var(--font-display);font-size:28px;font-weight:600;line-height:1.1}
+.stat .l{color:var(--ink-2);font-size:12.5px}
+.stat.warn .v{color:var(--warn)} .stat.crit .v{color:var(--crit)}
+table{border-collapse:collapse;width:100%}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--surface-2)}
+.tbl{overflow-x:auto}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:20px;padding:2px 9px;white-space:nowrap;background:var(--surface-2);color:var(--ink-2)}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.acc{background:var(--accent-soft);color:var(--accent-ink)}
+.cl{font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink-2);white-space:nowrap}
+.muted{color:var(--ink-2)} .small{font-size:12.5px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.li:last-child{border-bottom:0}
+.li .t{font-variant-numeric:tabular-nums;font-weight:600;width:46px;flex:none}
+.li .m{flex:1;min-width:160px}
+.li .m b{font-weight:600}
+.empty{color:var(--ink-2);padding:12px 0;font-size:13px}
+.search{display:flex;gap:8px;flex-wrap:wrap}
+.search input{flex:1;min-width:200px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px}
+/* Agenda */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 12px;cursor:pointer;font-weight:500;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--navy-ink)}
+.ag{overflow-x:auto}
+.agi{display:grid;min-width:520px}
+.ag-h{font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;position:sticky;top:0;background:var(--surface)}
+.ag-h small{display:block;font-weight:400;color:var(--ink-2);font-size:11.5px}
+.ag-times div{height:44px;font-size:11px;color:var(--ink-2);text-align:right;padding-right:8px;transform:translateY(-7px);font-variant-numeric:tabular-nums}
+.ag-col{position:relative;border-left:1px solid var(--line)}
+.slot{height:22px;border-bottom:1px dashed transparent;cursor:pointer}
+.slot.h{border-bottom:1px solid var(--line)}
+.slot.half{border-bottom:1px dashed var(--line)}
+.slot:hover{background:var(--accent-soft)}
+.slot.lunch{background:repeating-linear-gradient(135deg,var(--surface-2) 0 6px,transparent 6px 12px);cursor:default}
+.appt{position:absolute;left:4px;right:4px;border-radius:7px;padding:4px 8px;font-size:12px;line-height:1.25;cursor:pointer;overflow:hidden;border:1px solid var(--accent);background:var(--accent-soft);text-align:left}
+.appt b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appt span{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.appt.st-chegou{border-color:var(--good);background:var(--good-soft)}
+.appt.st-concluida{border-color:var(--line);background:var(--surface-2);opacity:.75}
+.appt.st-faltou{border-color:var(--crit);background:var(--crit-soft)}
+.appt.st-marcada{border-style:dashed}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--accent);background:var(--accent-soft)}
+/* Ficha */
+.pt-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:18px;flex:none}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{border:0;background:transparent;padding:10px 14px;cursor:pointer;color:var(--ink-2);font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;font-size:13.5px;align-content:start}
+.kv dt{color:var(--ink-2)} .kv dd{margin:0}
+.audio-svg{width:100%;height:auto;display:block}
+.thr{font-size:12.5px}
+.thr th,.thr td{padding:5px 6px;text-align:center}
+.thr input{width:52px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:3px 4px;text-align:center;font-variant-numeric:tabular-nums}
+.thr input:disabled{background:transparent;border-color:transparent}
+.ear-r{color:var(--ear-r);font-weight:600} .ear-l{color:var(--ear-l);font-weight:600}
+.att{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.att .ic{width:34px;height:40px;border-radius:5px;background:var(--surface-2);display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--ink-2);flex:none;overflow:hidden}
+.att .ic img{width:100%;height:100%;object-fit:cover}
+.att .m{flex:1;min-width:0}
+.att .m b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drop{border:1.5px dashed var(--accent);border-radius:8px;padding:16px;text-align:center;color:var(--ink-2);cursor:pointer;display:block}
+.drop.over{background:var(--accent-soft)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.pending{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--accent-soft);border-radius:8px;padding:10px}
+.pending select{border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:var(--surface)}
+.plan{list-style:none;margin:0;padding:0 0 0 18px;position:relative}
+.plan:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.plan li{position:relative;padding:6px 0 10px}
+.plan li:before{content:"";position:absolute;left:-18px;top:10px;width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);background:var(--surface)}
+.plan li.done:before{background:var(--accent)}
+.plan li.late:before{border-color:var(--crit)}
+.plan li .d{font-weight:600;font-variant-numeric:tabular-nums}
+.dev{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.hist .li .t{width:84px;font-weight:500;color:var(--ink-2)}
+/* Modal */
+.ov{position:fixed;inset:0;background:rgba(5,15,28,.5);display:flex;align-items:flex-start;justify-content:center;padding:max(40px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));z-index:50;overflow-y:auto}
+.mod{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:100%;max-width:560px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.mod .hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.mod .hd h2{font-size:17px;font-weight:600}
+.mod .hd button{margin-left:auto}
+.mod .bd{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.mod .ft{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.fg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label{font-size:12px;color:var(--ink-2);font-weight:500}
+.f input,.f select{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 10px;width:100%}
+.check{display:flex;gap:8px;align-items:center;font-size:13px}
+.check input{width:auto}
+.hint{font-size:12px;color:var(--ink-2)}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:12.5px}
+.stbtns{display:flex;gap:6px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--navy-ink);padding:10px 16px;border-radius:10px;font-size:13.5px;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+.big{max-width:100%;border-radius:8px;display:block;margin:0 auto}
+@media (max-width:900px){.grid2,.dev{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .body{flex-direction:column}
+  nav.side{width:auto;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:6px max(16px,env(safe-area-inset-left,0px))}
+  nav.side .who{display:none}
+  nav.side button{white-space:nowrap}
+  .fg{grid-template-columns:minmax(0,1fr)}
+  .kv{grid-template-columns:minmax(0,1fr)} .kv dt{margin-top:6px}
+  .ph h1{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+(function(){
+"use strict";
+var TODAY='2026-10-30';
+var FREQ=[250,500,1000,2000,4000,8000];
+var FREQL=['250','500','1k','2k','4k','8k'];
+var TYPES={aval:{l:'Avaliação auditiva',d:60},adapt:{l:'Adaptação de aparelho',d:60},rev:{l:'Revisão',d:30},manut:{l:'Manutenção e limpeza',d:30}};
+var STATUS={marcada:'Marcada',confirmada:'Confirmada',chegou:'Chegou',concluida:'Concluída',faltou:'Faltou'};
+var STPILL={marcada:'',confirmada:'acc',chegou:'good',concluida:'',faltou:'crit'};
+var ROLES={gestor:'Gestor da rede',audio:'Audiologista',rececao:'Receção'};
+var SUBS=['ADSE','SNS','IASFA','Outro','Nenhum'];
+var ORIG=['Médico de família','Médico ORL','Familiar ou amigo','Passou pela loja','Internet','Outro'];
+var EXT=['Audiometria tonal','Audiometria vocal','Timpanometria','Relatório médico','Receita','Outro'];
+var BRANDS=['Oticon','Phonak','Signia','Widex','ReSound','Starkey','Outra'];
+var WD=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+var MO=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+/* ---------- datas ---------- */
+function P(s){var a=s.split('-');return new Date(Date.UTC(+a[0],+a[1]-1,+a[2]));}
+function I(d){return d.toISOString().slice(0,10);}
+function addD(s,n){var d=P(s);d.setUTCDate(d.getUTCDate()+n);return I(d);}
+function addM(s,n){var d=P(s);var day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+n);var last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));return I(d);}
+function F(s){var a=s.split('-');return a[2]+'/'+a[1]+'/'+a[0];}
+function FL(s){var d=P(s);return WD[d.getUTCDay()]+', '+d.getUTCDate()+' '+MO[d.getUTCMonth()]+' '+d.getUTCFullYear();}
+function diff(a,b){return Math.round((P(b)-P(a))/864e5);}
+function age(b){var t=P(TODAY),d=P(b);var a=t.getUTCFullYear()-d.getUTCFullYear();if(t.getUTCMonth()<d.getUTCMonth()||(t.getUTCMonth()===d.getUTCMonth()&&t.getUTCDate()<d.getUTCDate()))a--;return a;}
+function tm(t){var a=t.split(':');return +a[0]*60+ +a[1];}
+function mt(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var uid=(function(){var n=1000;return function(p){n++;return p+n;};})();
+
+/* ---------- dados fictícios ---------- */
+function makePlan(fitted,wEnd){
+  var it=[{k:'2s',l:'Revisão 2 semanas',date:addD(fitted,14)},{k:'3m',l:'Revisão 3 meses',date:addM(fitted,3)}];
+  for(var y=1;y<10;y++){var d=addM(fitted,12*y);if(d>=wEnd)break;it.push({k:'a'+y,l:'Revisão anual',date:d});}
+  it.forEach(function(x){x.status=x.date<TODAY?'concluida':'por marcar';x.appt=null;});
+  it.push({k:'gar',l:'Fim da garantia',date:wEnd,status:wEnd<TODAY?'terminada':'aviso',appt:null,gar:true});
+  return it;
+}
+function seed(){
+  var D={};
+  D.clinics=[
+    {id:'cacem',name:'Agualva-Cacém',short:'Cacém',ers:'E172595',addr:'Praceta Fraternidade Universal 7B, 2735-106 Agualva-Cacém'},
+    {id:'vfx',name:'Vila Franca de Xira',short:'V. F. Xira',ers:'E181174',addr:'Rua António Palha 53, R/C Esq., 2400-104 Vila Franca de Xira'},
+    {id:'montijo',name:'Montijo',short:'Montijo',ers:'E184401',addr:'Rua Tenente Valadim 5, 2870-352 Montijo'}
+  ];
+  D.users=[
+    {id:'u1',name:'Carla Mendes',role:'gestor',clinics:['cacem','vfx','montijo'],email:'carla.mendes@exemplo.pt',st:'Ativo'},
+    {id:'u2',name:'Ana Silva',role:'rececao',clinics:['cacem'],email:'ana.silva@exemplo.pt',st:'Ativo'},
+    {id:'u3',name:'Bruno Alves',role:'rececao',clinics:['cacem'],email:'bruno.alves@exemplo.pt',st:'Ativo'},
+    {id:'u4',name:'Rui Costa',role:'audio',clinics:['cacem','montijo'],email:'rui.costa@exemplo.pt',st:'Ativo'},
+    {id:'u5',name:'Paulo Dias',role:'audio',clinics:['cacem'],email:'paulo.dias@exemplo.pt',st:'Ativo'},
+    {id:'u6',name:'Marta Lopes',role:'audio',clinics:['vfx'],email:'marta.lopes@exemplo.pt',st:'Ativo'},
+    {id:'u7',name:'Sofia Ramos',role:'rececao',clinics:['vfx'],email:'sofia.ramos@exemplo.pt',st:'Ativo'},
+    {id:'u8',name:'Inês Ferreira',role:'audio',clinics:['vfx','montijo'],email:'ines.ferreira@exemplo.pt',st:'Ativo'},
+    {id:'u9',name:'Tiago Santos',role:'rececao',clinics:['montijo'],email:'tiago.santos@exemplo.pt',st:'Ativo'},
+    {id:'u10',name:'Joana Reis',role:'rececao',clinics:['montijo'],email:'joana.reis@exemplo.pt',st:'Convite enviado'}
+  ];
+  function pt(id,name,birth,nif,phone,sub,clinic,origin){return {id:id,name:name,birth:birth,nif:nif,phone:phone,email:name.split(' ')[0].toLowerCase()+'.exemplo@email.pt',sns:String(100000000+Math.abs(hash(id))%899999999).replace(/(\d{3})(\d{3})(\d{3})/,'$1 $2 $3'),sub:sub,subNum:sub==='Nenhum'?'':'000 '+String(Math.abs(hash(name))%999).padStart(3,'0')+' '+String(Math.abs(hash(nif))%999).padStart(3,'0'),clinic:clinic,origin:origin,rgpd:true,created:'2024-01-01'};}
+  D.patients=[
+    pt('p1','Helena Marques','1951-03-12','245 118 302','912 345 678','ADSE','cacem','Médico de família'),
+    pt('p2','José Pinto','1946-07-02','198 552 410','913 220 114','SNS','cacem','Familiar ou amigo'),
+    pt('p3','Teresa Moura','1958-11-23','211 904 377','916 480 223','Nenhum','cacem','Internet'),
+    pt('p4','Carlos Nunes','1949-05-30','176 330 845','917 661 090','IASFA','vfx','Médico ORL'),
+    pt('p5','Rosa Alves','1940-01-14','150 227 981','914 052 331','ADSE','vfx','Passou pela loja'),
+    pt('p6','Manuel Sousa','1953-09-08','202 771 536','915 338 742','SNS','montijo','Médico de família'),
+    pt('p7','Fernanda Lima','1962-04-19','230 118 064','918 902 455','ADSE','montijo','Internet'),
+    pt('p8','António Rocha','1944-12-03','168 440 219','912 776 508','SNS','cacem','Familiar ou amigo'),
+    pt('p9','Lurdes Pereira','1955-06-27','219 005 783','913 118 960','ADSE','vfx','Médico ORL'),
+    pt('p10','Domingos Faria','1950-02-11','183 662 047','916 225 871','SNS','montijo','Médico de família'),
+    pt('p11','Céu Almeida','1957-08-15','224 390 618','917 504 129','Nenhum','vfx','Internet')
+  ];
+  function ap(id,p,c,u,date,time,type,st){return {id:id,patient:p,clinic:c,prof:u,date:date,time:time,dur:TYPES[type].d,type:type,status:st,reminder:true};}
+  D.appts=[
+    ap('a1','p3','cacem','u4',TODAY,'09:00','aval','confirmada'),
+    ap('a2','p2','cacem','u5',TODAY,'10:00','rev','chegou'),
+    ap('a3','p8','cacem','u4',TODAY,'10:30','manut','marcada'),
+    ap('a4','p1','cacem','u5',TODAY,'15:00','manut','marcada'),
+    ap('a5','p4','vfx','u6',TODAY,'09:30','adapt','confirmada'),
+    ap('a6','p9','vfx','u6',TODAY,'11:00','rev','marcada'),
+    ap('a7','p5','vfx','u6',TODAY,'15:00','manut','marcada'),
+    ap('a8','p6','montijo','u8',TODAY,'10:00','rev','confirmada'),
+    ap('a9','p10','montijo','u8',TODAY,'14:30','aval','marcada'),
+    ap('a10','p6','montijo','u8','2026-10-27','15:00','rev','faltou'),
+    ap('a11','p11','vfx','u6','2026-10-23','11:00','aval','faltou'),
+    ap('a12','p1','cacem','u5','2025-10-10','09:00','aval','concluida'),
+    ap('a13','p1','cacem','u4','2026-10-14','10:00','adapt','concluida'),
+    ap('a14','p1','cacem','u4','2026-10-28','12:00','rev','concluida'),
+    ap('a15','p8','montijo','u4','2026-09-18','16:00','manut','concluida'),
+    ap('a16','p4','vfx','u6','2026-10-16','10:00','aval','concluida'),
+    ap('a17','p7','montijo','u8','2026-08-12','10:00','adapt','concluida'),
+    ap('a18','p2','cacem','u5','2026-11-03','11:00','manut','marcada')
+  ];
+  D.exams=[
+    {id:'e1',patient:'p1',date:'2025-10-10',type:'Audiometria tonal',by:'u5',clinic:'cacem',R:[20,25,35,45,55,60],L:[20,25,35,50,60,65]},
+    {id:'e2',patient:'p1',date:'2026-10-14',type:'Audiometria tonal',by:'u4',clinic:'cacem',R:[25,30,40,55,65,70],L:[20,30,45,60,70,75]},
+    {id:'e3',patient:'p2',date:'2025-11-20',type:'Audiometria tonal',by:'u5',clinic:'cacem',R:[35,40,50,60,70,75],L:[30,40,55,65,75,80]},
+    {id:'e4',patient:'p5',date:'2025-03-01',type:'Audiometria tonal',by:'u6',clinic:'vfx',R:[30,35,45,55,60,65],L:[15,15,20,25,30,40]},
+    {id:'e5',patient:'p7',date:'2026-07-30',type:'Audiometria tonal',by:'u8',clinic:'montijo',R:[25,30,35,45,50,55],L:[25,30,40,45,55,60]},
+    {id:'e6',patient:'p9',date:'2023-12-01',type:'Audiometria tonal',by:'u6',clinic:'vfx',R:[10,10,15,20,25,30],L:[30,35,45,50,60,65]},
+    {id:'e7',patient:'p6',date:'2026-07-05',type:'Audiometria tonal',by:'u8',clinic:'montijo',R:[40,45,55,65,75,80],L:[35,45,55,60,70,80]},
+    {id:'e8',patient:'p8',date:'2026-09-18',type:'Audiometria tonal',by:'u4',clinic:'montijo',R:[45,50,60,70,80,85],L:[40,50,60,70,80,90]},
+    {id:'e9',patient:'p4',date:'2026-10-16',type:'Audiometria tonal',by:'u6',clinic:'vfx',R:[20,25,30,45,55,60],L:[25,30,40,50,60,65]}
+  ];
+  D.atts=[
+    {id:'f1',patient:'p1',name:'Audiograma_14-10-2026.pdf',type:'Audiometria tonal',date:'2026-10-14',by:'u4',clinic:'cacem'},
+    {id:'f2',patient:'p1',name:'Timpanograma_14-10-2026.png',type:'Timpanometria',date:'2026-10-14',by:'u4',clinic:'cacem'},
+    {id:'f3',patient:'p1',name:'Relatorio_ORL_02-09-2026.pdf',type:'Relatório médico',date:'2026-09-02',by:'u2',clinic:'cacem'},
+    {id:'f4',patient:'p4',name:'Prescricao_ORL_09-10-2026.pdf',type:'Relatório médico',date:'2026-10-09',by:'u7',clinic:'vfx'},
+    {id:'f5',patient:'p8',name:'Audiograma_18-09-2026.pdf',type:'Audiometria tonal',date:'2026-09-18',by:'u4',clinic:'montijo'}
+  ];
+  function dv(id,p,brand,model,ear,ser,fitted,years,clinic){var w=addM(fitted,12*years);return {id:id,patient:p,brand:brand,model:model,ear:ear,serials:ser,fitted:fitted,wEnd:w,clinic:clinic,status:'ativo',assist:null,plan:makePlan(fitted,w),events:[{date:fitted,text:'Adaptação de '+brand+' '+model}]};}
+  D.devices=[
+    dv('d1','p1','Oticon','RIC recarregável','Bilateral','D 2614-0081 · E 2614-0082','2026-10-14',3,'cacem'),
+    dv('d2','p2','Phonak','BTE','Bilateral','D 1938-2201 · E 1938-2202','2023-11-20',3,'cacem'),
+    dv('d3','p5','Signia','ITC','Direito','D 7731-0412','2025-03-10',3,'vfx'),
+    dv('d4','p7','Widex','RIC','Bilateral','D 5520-1180 · E 5520-1181','2026-08-12',3,'montijo'),
+    dv('d5','p9','ReSound','RIC','Esquerdo','E 3307-9925','2023-12-15',3,'vfx'),
+    dv('d6','p6','Oticon','BTE','Bilateral','D 2511-4470 · E 2511-4471','2026-07-20',3,'montijo'),
+    dv('d7','p8','Phonak','RIC','Bilateral','D 1622-0390 · E 1622-0391','2022-05-04',3,'cacem')
+  ];
+  var d1=D.devices[0];d1.plan[0].status='concluida';d1.plan[0].appt='a14';
+  var d6=D.devices[5];d6.plan[1].status='marcada';d6.plan[1].appt='a8';
+  var d3=D.devices[2];d3.status='assistencia';d3.assist={date:'2026-10-20',reason:'Sem som no ouvido direito'};d3.events.push({date:'2026-10-20',text:'Enviado para assistência: sem som no ouvido direito'});
+  return D;
+}
+function hash(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
+
+var D=seed();
+var S={view:'inicio',clinic:'all',user:'u1',patient:null,tab:'resumo',date:TODAY,agClinic:'cacem',search:'',modal:null,examSel:null,compare:true,pending:null,equipaTab:'users'};
+
+/* ---------- consultas ---------- */
+function U(id){return D.users.find(function(u){return u.id===id;})||{name:'(desconhecido)',role:'',clinics:[]};}
+function Pt(id){return D.patients.find(function(p){return p.id===id;});}
+function C(id){return D.clinics.find(function(c){return c.id===id;})||{name:'',short:''};}
+function me(){return U(S.user);}
+function allowed(){var u=me();return u.role==='gestor'?D.clinics.map(function(c){return c.id;}):u.clinics.slice();}
+function scope(){return S.clinic==='all'?allowed():[S.clinic];}
+function inScope(c){return scope().indexOf(c)>=0;}
+function canClinical(){return me().role!=='rececao';}
+function devOf(p){return D.devices.filter(function(d){return d.patient===p;});}
+function examsOf(p){return D.exams.filter(function(e){return e.patient===p;}).sort(function(a,b){return a.date<b.date?1:-1;});}
+function apptsOf(p){return D.appts.filter(function(a){return a.patient===p;});}
+function nextAppt(p){return apptsOf(p).filter(function(a){return a.date>=TODAY&&a.status!=='faltou'&&a.status!=='concluida';}).sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;})[0];}
+function lastSeen(p){var l=apptsOf(p).filter(function(a){return a.status==='concluida'||(a.date<=TODAY&&a.status==='chegou');}).sort(function(a,b){return a.date<b.date?1:-1;})[0];return l?l.date:null;}
+function profsOf(c){return D.users.filter(function(u){return u.role==='audio'&&u.clinics.indexOf(c)>=0&&u.st==='Ativo';});}
+function staffFor(c){return D.users.filter(function(u){return u.role!=='gestor'&&u.clinics.indexOf(c)>=0&&u.st==='Ativo';});}
+
+function reviewsDue(){
+  var out=[];D.devices.forEach(function(d){var p=Pt(d.patient);if(!inScope(p.clinic))return;d.plan.forEach(function(it,i){if(it.gar)return;if(it.status==='por marcar'&&it.date<=addD(TODAY,30))out.push({d:d,it:it,i:i,p:p,late:it.date<TODAY});});});
+  return out.sort(function(a,b){return a.it.date<b.it.date?-1:1;});
+}
+function noShows(){
+  return D.appts.filter(function(a){return a.status==='faltou'&&diff(a.date,TODAY)<=30&&inScope(a.clinic)&&!D.appts.some(function(b){return b.patient===a.patient&&b.id!==a.id&&(b.date+b.time)>(a.date+a.time)&&b.status!=='faltou';});});
+}
+function warrantiesEnding(){return D.devices.filter(function(d){return inScope(Pt(d.patient).clinic)&&d.wEnd>=TODAY&&d.wEnd<=addD(TODAY,60);}).sort(function(a,b){return a.wEnd<b.wEnd?-1:1;});}
+function inAssist(){return D.devices.filter(function(d){return d.status==='assistencia'&&inScope(Pt(d.patient).clinic);});}
+function todayAppts(cs){cs=cs||scope();return D.appts.filter(function(a){return a.date===TODAY&&cs.indexOf(a.clinic)>=0;}).sort(function(a,b){return a.time<b.time?-1:1;});}
+
+function bpta(arr){var v=(arr[1]+arr[2]+arr[3]+arr[4])/4;var l=v<=20?'Audição normal':v<=40?'Perda ligeira':v<=70?'Perda moderada':v<=90?'Perda severa':'Perda profunda';var cls=v<=20?'good':v<=40?'acc':v<=70?'warn':'crit';return {v:Math.round(v),l:l,cls:cls};}
+
+/* ---------- componentes ---------- */
+function clTag(c){return '<span class="cl">'+esc(C(c).short)+'</span>';}
+function stPill(s){return '<span class="pill '+(STPILL[s]||'')+'">'+STATUS[s]+'</span>';}
+function initials(n){var a=n.split(' ');return (a[0][0]+(a[a.length-1][0]||'')).toUpperCase();}
+
+function audiogram(ex,prev){
+  var W=440,H=300,l=44,r=14,t=14,b=30,iw=W-l-r,ih=H-t-b;
+  function X(i){return l+i*iw/5;} function Y(db){return t+(db+10)/130*ih;}
+  var s='<svg class="audio-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Audiograma tonal de '+F(ex.date)+'">';
+  s+='<rect x="'+l+'" y="'+Y(-10)+'" width="'+iw+'" height="'+(Y(20)-Y(-10))+'" fill="var(--good-soft)" opacity=".7"/>';
+  for(var db=-10;db<=120;db+=10){s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+Y(db)+'" y2="'+Y(db)+'" stroke="var(--line)" stroke-width="'+(db%20===0?1:.5)+'"/>';if(db%20===0)s+='<text x="'+(l-8)+'" y="'+(Y(db)+4)+'" font-size="11" text-anchor="end" fill="var(--ink-2)">'+db+'</text>';}
+  for(var i=0;i<6;i++){s+='<line x1="'+X(i)+'" x2="'+X(i)+'" y1="'+t+'" y2="'+(H-b)+'" stroke="var(--line)" stroke-width=".5"/><text x="'+X(i)+'" y="'+(H-b+18)+'" font-size="11" text-anchor="middle" fill="var(--ink-2)">'+FREQL[i]+'</text>';}
+  s+='<text x="'+(l+4)+'" y="'+(Y(20)-5)+'" font-size="10" fill="var(--good)">normal</text>';
+  s+='<text x="12" y="'+(t+ih/2)+'" font-size="10.5" fill="var(--ink-2)" transform="rotate(-90 12 '+(t+ih/2)+')" text-anchor="middle">dB HL</text>';
+  function series(arr,ear,op,dash){var c=ear==='R'?'var(--ear-r)':'var(--ear-l)';var pts=arr.map(function(v,i){return X(i)+','+Y(v);}).join(' ');var o='<g opacity="'+op+'"><polyline points="'+pts+'" fill="none" stroke="'+c+'" stroke-width="1.6"'+(dash?' stroke-dasharray="5 4"':'')+'/>';arr.forEach(function(v,i){var x=X(i),y=Y(v);o+=ear==='R'?'<circle cx="'+x+'" cy="'+y+'" r="5" fill="var(--surface)" stroke="'+c+'" stroke-width="1.8"/>':'<path d="M'+(x-4.5)+' '+(y-4.5)+'L'+(x+4.5)+' '+(y+4.5)+'M'+(x-4.5)+' '+(y+4.5)+'L'+(x+4.5)+' '+(y-4.5)+'" stroke="'+c+'" stroke-width="1.9"/>';});return o+'</g>';}
+  if(prev){s+=series(prev.R,'R',.28,false)+series(prev.L,'L',.28,true);}
+  s+=series(ex.R,'R',1,false)+series(ex.L,'L',1,true);
+  return s+'</svg>';
+}
+
+/* ---------- vistas ---------- */
+function vInicio(){
+  var u=me(),ta=todayAppts(),rd=reviewsDue(),ns=noShows(),we=warrantiesEnding(),ia=inAssist();
+  var h='<div class="ph"><div><h1>Bom dia, '+esc(u.name.split(' ')[0])+'</h1><div class="sub">'+FL(TODAY)+' · '+(S.clinic==='all'?'Rede Acústica Mais, 3 clínicas':esc(C(S.clinic).name))+'</div></div><div class="act"><button class="btn pri" data-a="new-appt">+ Nova marcação</button><button class="btn" data-a="new-patient">+ Novo paciente</button></div></div>';
+  h+='<div class="stats">'+
+    '<button class="stat" data-a="nav" data-v="agenda"><span class="v tnum">'+ta.length+'</span><span class="l">Marcações hoje</span></button>'+
+    '<button class="stat '+(rd.length?'warn':'')+'" data-a="nav" data-v="posvenda"><span class="v tnum">'+rd.length+'</span><span class="l">Revisões por marcar (30 dias)</span></button>'+
+    '<button class="stat '+(ns.length?'crit':'')+'" data-a="nav" data-v="posvenda"><span class="v tnum">'+ns.length+'</span><span class="l">Faltas a recontactar</span></button>'+
+    '<button class="stat" data-a="nav" data-v="posvenda"><span class="v tnum">'+(we.length+ia.length)+'</span><span class="l">Garantias a terminar e assistências</span></button></div>';
+  if(S.clinic==='all'){
+    h+='<div class="card"><div class="hd"><h2>Visão da rede</h2><span class="note">só o gestor vê as três clínicas lado a lado</span></div><div class="tbl"><table><thead><tr><th>Clínica</th><th>Marcações hoje</th><th>Chegaram</th><th>Revisões por marcar</th><th>Faltas</th><th>Em assistência</th><th>Equipa</th></tr></thead><tbody>';
+    D.clinics.forEach(function(c){var one=[c.id];var tA=todayAppts(one);var save=S.clinic;S.clinic=c.id;var r1=reviewsDue().length,r2=noShows().length,r3=inAssist().length;S.clinic=save;
+      h+='<tr class="click" data-a="pick-clinic" data-c="'+c.id+'"><td><b>'+esc(c.name)+'</b></td><td class="tnum">'+tA.length+'</td><td class="tnum">'+tA.filter(function(a){return a.status==='chegou'||a.status==='concluida';}).length+'</td><td class="tnum">'+(r1?'<span class="pill warn">'+r1+'</span>':'0')+'</td><td class="tnum">'+(r2?'<span class="pill crit">'+r2+'</span>':'0')+'</td><td class="tnum">'+r3+'</td><td class="tnum">'+staffFor(c.id).length+'</td></tr>';});
+    h+='</tbody></table></div></div>';
+  }
+  h+='<div class="grid2"><div class="card"><div class="hd"><h2>Hoje</h2><span class="note">'+ta.length+' marcações</span><div class="r"><button class="btn sm ghost" data-a="nav" data-v="agenda">Abrir agenda</button></div></div><div class="bd"><div class="list">';
+  if(!ta.length)h+='<div class="empty">Sem marcações hoje.</div>';
+  ta.forEach(function(a){var p=Pt(a.patient);h+='<div class="li"><span class="t">'+a.time+'</span><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">'+TYPES[a.type].l+' · '+esc(U(a.prof).name)+'</div></div>'+(S.clinic==='all'?clTag(a.clinic):'')+stPill(a.status)+'<button class="btn sm" data-a="appt" data-id="'+a.id+'">Abrir</button></div>';});
+  h+='</div></div></div><div class="card"><div class="hd"><h2>Precisa de ação</h2></div><div class="bd"><div class="list">';
+  var acts=[];
+  rd.slice(0,3).forEach(function(x){acts.push('<div class="li"><div class="m"><b>'+esc(x.p.name)+'</b><div class="small muted">'+x.it.l+' prevista para '+F(x.it.date)+'</div></div>'+(x.late?'<span class="pill crit">Em atraso</span>':'<span class="pill warn">Por marcar</span>')+'<button class="btn sm" data-a="plan-book" data-d="'+x.d.id+'" data-i="'+x.i+'">Marcar</button></div>');});
+  ns.slice(0,2).forEach(function(a){var p=Pt(a.patient);acts.push('<div class="li"><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">Faltou a '+F(a.date)+' · '+TYPES[a.type].l+'</div></div><span class="pill crit">Faltou</span><button class="btn sm" data-a="open-patient" data-id="'+p.id+'">Ficha</button></div>');});
+  ia.slice(0,2).forEach(function(d){var p=Pt(d.patient);acts.push('<div class="li"><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">'+esc(d.brand+' '+d.model)+' em assistência desde '+F(d.assist.date)+'</div></div><span class="pill">Assistência</span><button class="btn sm" data-a="open-dev" data-id="'+p.id+'">Ver</button></div>');});
+  h+=acts.length?acts.join(''):'<div class="empty">Nada pendente.</div>';
+  h+='</div></div></div></div>';
+  return h;
+}
+
+function vAgenda(){
+  var cs=allowed();if(S.clinic!=='all')S.agClinic=S.clinic;if(cs.indexOf(S.agClinic)<0)S.agClinic=cs[0];
+  var c=S.agClinic,profs=profsOf(c);
+  var h='<div class="ph"><div><h1>Agenda</h1><div class="sub">'+esc(C(c).name)+' · uma coluna por profissional · horário 09:00 a 19:00, almoço 13:00 a 14:00</div></div><div class="act"><button class="btn sm" data-a="day" data-n="-1" aria-label="Dia anterior">‹</button><span class="btn sm ghost" style="cursor:default">'+FL(S.date)+'</span><button class="btn sm" data-a="day" data-n="1" aria-label="Dia seguinte">›</button>'+(S.date!==TODAY?'<button class="btn sm" data-a="day" data-n="0">Hoje</button>':'')+'<button class="btn pri" data-a="new-appt">+ Nova marcação</button></div></div>';
+  if(S.clinic==='all'){h+='<div class="chips">'+cs.map(function(id){var n=D.appts.filter(function(a){return a.date===S.date&&a.clinic===id;}).length;return '<button class="chip" data-a="ag-clinic" data-c="'+id+'" aria-pressed="'+(id===c)+'">'+esc(C(id).name)+' · '+n+'</button>';}).join('')+'</div>';}
+  var start=9*60,end=19*60,rows=(end-start)/15;
+  h+='<div class="card"><div class="ag"><div class="agi" style="grid-template-columns:56px repeat('+Math.max(profs.length,1)+',minmax(150px,1fr))">';
+  h+='<div class="ag-h"></div>';profs.forEach(function(p){var n=D.appts.filter(function(a){return a.date===S.date&&a.clinic===c&&a.prof===p.id;}).length;h+='<div class="ag-h">'+esc(p.name)+'<small>'+n+' marcações</small></div>';});
+  if(!profs.length)h+='<div class="ag-h">Sem audiologistas nesta clínica</div>';
+  h+='<div class="ag-times">';for(var m=start;m<end;m+=30){h+='<div>'+(m%60===0?mt(m):'')+'</div>';}h+='</div>';
+  profs.forEach(function(p){
+    h+='<div class="ag-col">';
+    for(var k=0;k<rows;k++){var mm=start+k*15;var lunch=mm>=780&&mm<840;var cls=lunch?'slot lunch':'slot '+((k%4===3)?'h':(k%2===1?'half':''));h+='<div class="'+cls+'"'+(lunch?'':' data-a="slot" data-p="'+p.id+'" data-t="'+mt(mm-(mm%30))+'"')+' title="'+(lunch?'Almoço':'Marcar às '+mt(mm-(mm%30)))+'"></div>';}
+    D.appts.filter(function(a){return a.date===S.date&&a.clinic===c&&a.prof===p.id;}).forEach(function(a){var top=(tm(a.time)-start)/15*22,hh=a.dur/15*22-3;var pt=Pt(a.patient);
+      h+='<button class="appt st-'+a.status+'" style="top:'+top+'px;height:'+hh+'px" data-a="appt" data-id="'+a.id+'"><b>'+esc(pt.name)+'</b><span>'+a.time+' · '+TYPES[a.type].l+'</span>'+(hh>60?'<span>'+STATUS[a.status]+'</span>':'')+'</button>';});
+    h+='</div>';
+  });
+  h+='</div></div></div>';
+  h+='<div class="legend"><span><i style="border-style:dashed"></i>Marcada</span><span><i></i>Confirmada</span><span><i style="border-color:var(--good);background:var(--good-soft)"></i>Chegou</span><span><i style="border-color:var(--line);background:var(--surface-2)"></i>Concluída</span><span><i style="border-color:var(--crit);background:var(--crit-soft)"></i>Faltou</span><span>Clique num espaço livre para marcar.</span></div>';
+  return h;
+}
+
+function vPacientes(){
+  var q=S.search.trim().toLowerCase().replace(/\s/g,'');
+  var list=D.patients.filter(function(p){if(!q)return true;return (p.name.toLowerCase().replace(/\s/g,'').indexOf(q)>=0)||p.nif.replace(/\s/g,'').indexOf(q)>=0||p.phone.replace(/\s/g,'').indexOf(q)>=0;}).sort(function(a,b){return a.name.localeCompare(b.name,'pt');});
+  var h='<div class="ph"><div><h1>Pacientes</h1><div class="sub">'+D.patients.length+' pacientes na rede · a ficha é partilhada pelas três clínicas</div></div><div class="act"><button class="btn pri" data-a="new-patient">+ Novo paciente</button></div></div>';
+  h+='<div class="search"><input id="q" type="search" placeholder="Pesquisar por nome, NIF ou telemóvel" value="'+esc(S.search)+'" aria-label="Pesquisar pacientes"></div>';
+  h+='<div class="card"><div class="tbl"><table><thead><tr><th>Nome</th><th>Idade</th><th>NIF</th><th>Telemóvel</th><th>Subsistema</th><th>Clínica principal</th><th>Última visita</th><th>Aparelho</th></tr></thead><tbody id="ptrows">';
+  if(!list.length)h+='<tr><td colspan="8" class="empty">Nenhum paciente encontrado. Pode registá-lo em + Novo paciente.</td></tr>';
+  list.forEach(function(p){var ls=lastSeen(p.id),dv=devOf(p.id);h+='<tr class="click" data-a="open-patient" data-id="'+p.id+'"><td><b>'+esc(p.name)+'</b></td><td class="tnum">'+age(p.birth)+'</td><td class="tnum">'+esc(p.nif)+'</td><td class="tnum">'+esc(p.phone)+'</td><td>'+esc(p.sub)+'</td><td>'+clTag(p.clinic)+'</td><td class="tnum">'+(ls?F(ls):'<span class="muted">nova</span>')+'</td><td>'+(dv.length?esc(dv[0].brand)+(dv[0].status==='assistencia'?' <span class="pill">assistência</span>':''):'<span class="muted">não</span>')+'</td></tr>';});
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+function vFicha(){
+  var p=Pt(S.patient);if(!p){S.view='pacientes';return vPacientes();}
+  var ex=examsOf(p.id),dv=devOf(p.id),na=nextAppt(p.id);
+  var h='<div><button class="btn sm ghost" data-a="nav" data-v="pacientes">‹ Pacientes</button></div>';
+  h+='<div class="pt-head"><div class="avatar">'+initials(p.name)+'</div><div style="min-width:0"><h1 style="font-size:24px;font-weight:600">'+esc(p.name)+'</h1><div class="sub muted">'+age(p.birth)+' anos · NIF '+esc(p.nif)+' · '+esc(p.sub)+' · Clínica principal: '+esc(C(p.clinic).name)+'</div></div><div class="act" style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-a="new-appt" data-p="'+p.id+'">+ Marcar</button></div></div>';
+  var tabs=[['resumo','Resumo'],['exames','Exames ('+(ex.length+D.atts.filter(function(a){return a.patient===p.id;}).length)+')'],['aparelhos','Aparelhos ('+dv.length+')'],['historico','Histórico']];
+  h+='<div class="tabs" role="tablist">'+tabs.map(function(t){return '<button role="tab" data-a="tab" data-t="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div>';
+  if(S.tab==='resumo'){
+    h+='<div class="grid2"><div class="card"><div class="hd"><h2>Dados do paciente</h2></div><div class="bd"><dl class="kv">'+
+      '<dt>Data de nascimento</dt><dd class="tnum">'+F(p.birth)+'</dd><dt>Telemóvel</dt><dd class="tnum">'+esc(p.phone)+'</dd><dt>Email</dt><dd>'+esc(p.email)+'</dd><dt>N.º utente SNS</dt><dd class="tnum">'+esc(p.sns)+'</dd><dt>Subsistema</dt><dd>'+esc(p.sub)+(p.subNum?' · <span class="tnum">'+esc(p.subNum)+'</span>':'')+'</dd><dt>Como nos conheceu</dt><dd>'+esc(p.origin)+'</dd><dt>Consentimento RGPD</dt><dd>'+(p.rgpd?'<span class="pill good">Assinado</span>':'<span class="pill crit">Em falta</span>')+'</dd></dl></div></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:18px;min-width:0"><div class="card"><div class="hd"><h2>Próxima marcação</h2></div><div class="bd">'+(na?'<div class="li" style="padding:0"><div class="m"><b>'+FL(na.date)+', '+na.time+'</b><div class="small muted">'+TYPES[na.type].l+' · '+esc(U(na.prof).name)+'</div></div>'+clTag(na.clinic)+stPill(na.status)+'</div>':'<div class="empty" style="padding:0">Sem marcações futuras.</div>')+'</div></div>';
+    if(ex.length){var b=[bpta(ex[0].R),bpta(ex[0].L)];h+='<div class="card"><div class="hd"><h2>Última audiometria</h2><span class="note">'+F(ex[0].date)+'</span><div class="r"><button class="btn sm ghost" data-a="tab" data-t="exames">Ver audiograma</button></div></div><div class="bd" style="display:flex;flex-direction:column;gap:6px"><div><span class="ear-r">OD</span> '+b[0].l+' <span class="muted tnum">· média '+b[0].v+' dB</span></div><div><span class="ear-l">OE</span> '+b[1].l+' <span class="muted tnum">· média '+b[1].v+' dB</span></div></div></div>';}
+    if(dv.length){var d=dv[0];h+='<div class="card"><div class="hd"><h2>Aparelho</h2><div class="r"><button class="btn sm ghost" data-a="tab" data-t="aparelhos">Ver plano</button></div></div><div class="bd">'+esc(d.brand+' · '+d.model+' · '+d.ear)+'<div class="small muted">Adaptado a '+F(d.fitted)+' · garantia até '+F(d.wEnd)+'</div></div></div>';}
+    h+='</div></div>';
+  }
+  if(S.tab==='exames')h+=fichaExames(p,ex);
+  if(S.tab==='aparelhos')h+=fichaAparelhos(p,dv);
+  if(S.tab==='historico')h+=fichaHist(p);
+  return h;
+}
+
+function fichaExames(p,ex){
+  var h='<div class="grid2"><div class="card"><div class="hd"><h2>Audiograma tonal</h2>';
+  if(ex.length){if(!S.examSel||!ex.some(function(e){return e.id===S.examSel;}))S.examSel=ex[0].id;
+    h+='<select id="examSel" class="btn sm" aria-label="Escolher audiometria">'+ex.map(function(e){return '<option value="'+e.id+'"'+(e.id===S.examSel?' selected':'')+'>'+F(e.date)+' · '+esc(U(e.by).name)+'</option>';}).join('')+'</select>';}
+  h+='<div class="r">'+(canClinical()?'<button class="btn sm" data-a="new-audio">+ Nova audiometria</button>':'')+'</div></div><div class="bd">';
+  if(!ex.length){h+='<div class="empty">Ainda sem audiometrias. '+(canClinical()?'Clique em + Nova audiometria para registar os limiares.':'O audiologista regista os limiares na consulta.')+'</div>';}
+  else{
+    var e=ex.find(function(x){return x.id===S.examSel;}),idx=ex.indexOf(e),prev=ex[idx+1];
+    var editable=canClinical()&&e.date===TODAY;
+    h+='<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:12.5px;margin-bottom:6px"><span><span class="ear-r">○</span> Ouvido direito</span><span><span class="ear-l">✕</span> Ouvido esquerdo</span>'+(prev?'<label class="check" style="margin-left:auto"><input type="checkbox" id="cmp"'+(S.compare?' checked':'')+'> Comparar com '+F(prev.date)+'</label>':'')+'</div>';
+    h+='<div id="audioSvg">'+audiogram(e,S.compare?prev:null)+'</div>';
+    h+='<div id="audioClass" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px">'+classHTML(e)+'</div>';
+    h+='<div class="tbl"><table class="thr"><thead><tr><th>Hz</th>'+FREQL.map(function(f){return '<th>'+f+'</th>';}).join('')+'</tr></thead><tbody>';
+    ['R','L'].forEach(function(ear){h+='<tr><td class="'+(ear==='R'?'ear-r':'ear-l')+'">'+(ear==='R'?'OD':'OE')+'</td>'+e[ear].map(function(v,i){return '<td><input type="number" class="tnum" min="-10" max="120" step="5" id="th-'+ear+'-'+i+'" data-ear="'+ear+'" data-i="'+i+'" value="'+v+'"'+(editable?'':' disabled')+' aria-label="'+(ear==='R'?'Direito':'Esquerdo')+' '+FREQL[i]+' Hz"></td>';}).join('')+'</tr>';});
+    h+='</tbody></table></div><div class="hint" style="margin-top:6px">'+(editable?'Altere os limiares: o audiograma redesenha-se e a classificação é recalculada.':'Audiometrias de dias anteriores ficam só para consulta.')+' Classificação BIAP, média de 500, 1000, 2000 e 4000 Hz.</div>';
+  }
+  h+='</div></div>';
+  var at=D.atts.filter(function(a){return a.patient===p.id;}).sort(function(a,b){return a.date<b.date?1:-1;});
+  h+='<div class="card"><div class="hd"><h2>Documentos e exames anexados</h2><span class="note">'+at.length+'</span></div><div class="bd" style="display:flex;flex-direction:column;gap:8px">';
+  at.forEach(function(a){var isImg=/\.(png|jpe?g)$/i.test(a.name);h+='<div class="att"><div class="ic">'+(a.url&&isImg?'<img src="'+a.url+'" alt="">':(isImg?'IMG':'PDF'))+'</div><div class="m"><b>'+esc(a.name)+'</b><div class="small muted">'+esc(a.type)+' · '+F(a.date)+' · '+esc(U(a.by).name)+' · '+esc(C(a.clinic).short)+'</div></div><button class="btn sm" data-a="view-att" data-id="'+a.id+'">Ver</button></div>';});
+  if(!at.length)h+='<div class="empty" style="padding:0">Ainda sem documentos.</div>';
+  if(S.pending){h+='<div class="pending"><b style="flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(S.pending.name)+'</b><select id="attType" aria-label="Tipo de documento">'+EXT.map(function(x){return '<option>'+x+'</option>';}).join('')+'</select><button class="btn sm pri" data-a="att-save">Anexar</button><button class="btn sm ghost" data-a="att-cancel">Cancelar</button></div>';}
+  h+='<label class="drop" id="drop" for="fileIn"><input type="file" id="fileIn" accept=".pdf,.png,.jpg,.jpeg"><b>+ Anexar exame</b><br><span class="small">Arraste um PDF ou imagem para aqui, ou clique para escolher</span></label>';
+  h+='<div class="hint">No protótipo o ficheiro fica só neste navegador e desaparece ao recarregar.</div></div></div></div>';
+  return h;
+}
+function classHTML(e){var r=bpta(e.R),l=bpta(e.L);return '<span class="pill '+r.cls+'"><span class="ear-r">OD</span> '+r.l+' · '+r.v+' dB</span><span class="pill '+l.cls+'"><span class="ear-l">OE</span> '+l.l+' · '+l.v+' dB</span>';}
+
+function fichaAparelhos(p,dv){
+  var h='<div style="display:flex;justify-content:flex-end"><button class="btn pri" data-a="new-dev">+ Registar aparelho</button></div>';
+  if(!dv.length)h+='<div class="card"><div class="bd"><div class="empty">Sem aparelhos registados. Ao registar um aparelho, o plano de revisões e o aviso de fim de garantia são criados automaticamente.</div></div></div>';
+  dv.forEach(function(d){
+    h+='<div class="card"><div class="hd"><h2>'+esc(d.brand)+' · '+esc(d.model)+'</h2>'+(d.status==='assistencia'?'<span class="pill warn">Em assistência desde '+F(d.assist.date)+'</span>':'<span class="pill good">Em uso</span>')+'<div class="r">'+(d.status==='assistencia'?'<button class="btn sm" data-a="dev-return" data-id="'+d.id+'">Registar regresso</button>':'<button class="btn sm" data-a="dev-assist" data-id="'+d.id+'">Enviar para assistência</button>')+'</div></div><div class="bd dev">';
+    h+='<dl class="kv"><dt>Ouvido</dt><dd>'+esc(d.ear)+'</dd><dt>N.º de série</dt><dd class="tnum">'+esc(d.serials)+'</dd><dt>Data de adaptação</dt><dd class="tnum">'+F(d.fitted)+'</dd><dt>Garantia até</dt><dd class="tnum">'+F(d.wEnd)+(d.wEnd<TODAY?' <span class="pill">terminada</span>':diff(TODAY,d.wEnd)<=60?' <span class="pill warn">termina em '+diff(TODAY,d.wEnd)+' dias</span>':'')+'</dd><dt>Clínica</dt><dd>'+esc(C(d.clinic).name)+'</dd>'+(d.assist?'<dt>Motivo da assistência</dt><dd>'+esc(d.assist.reason)+'</dd>':'')+'</dl>';
+    h+='<div><div class="small muted" style="margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Plano de acompanhamento</div><ul class="plan">';
+    d.plan.forEach(function(it,i){var late=it.status==='por marcar'&&it.date<TODAY;var done=it.status==='concluida'||it.status==='terminada';
+      h+='<li class="'+(done?'done':'')+(late?' late':'')+'"><span class="d">'+F(it.date)+'</span> · '+esc(it.l)+'<div class="small muted">';
+      if(it.gar)h+=it.status==='terminada'?'Garantia terminada':'Aviso no Pós-venda 60 dias antes';
+      else if(it.status==='concluida')h+='Concluída';
+      else if(it.status==='marcada'){var a=D.appts.find(function(x){return x.id===it.appt;});h+='Marcada'+(a?' · '+F(a.date)+' '+a.time+' · '+esc(U(a.prof).name):'');}
+      else h+=(late?'<span style="color:var(--crit)">Em atraso</span> · ':'Por marcar · ')+'<button class="btn sm" style="padding:1px 8px" data-a="plan-book" data-d="'+d.id+'" data-i="'+i+'">Marcar agora</button>';
+      h+='</div></li>';});
+    h+='</ul></div></div></div>';
+  });
+  return h;
+}
+
+function fichaHist(p){
+  var ev=[];
+  apptsOf(p.id).forEach(function(a){ev.push({date:a.date,k:a.date+a.time,t:TYPES[a.type].l+' com '+U(a.prof).name,c:a.clinic,pill:stPill(a.status)});});
+  D.exams.filter(function(e){return e.patient===p.id;}).forEach(function(e){ev.push({date:e.date,k:e.date+'99',t:'Audiometria registada por '+U(e.by).name,c:e.clinic,pill:'<span class="pill acc">Exame</span>'});});
+  D.atts.filter(function(a){return a.patient===p.id;}).forEach(function(a){ev.push({date:a.date,k:a.date+'98',t:'Documento anexado: '+a.name,c:a.clinic,pill:'<span class="pill">Anexo</span>'});});
+  devOf(p.id).forEach(function(d){d.events.forEach(function(e){ev.push({date:e.date,k:e.date+'97',t:e.text,c:d.clinic,pill:'<span class="pill">Aparelho</span>'});});});
+  ev.sort(function(a,b){return a.k<b.k?1:-1;});
+  var cl={};ev.forEach(function(e){cl[e.c]=1;});
+  var h='<div class="card"><div class="hd"><h2>Histórico</h2><span class="note">'+(Object.keys(cl).length>1?'atendido em '+Object.keys(cl).length+' clínicas da rede, tudo na mesma ficha':ev.length+' registos')+'</span></div><div class="bd hist"><div class="list">';
+  ev.forEach(function(e){h+='<div class="li"><span class="t tnum">'+F(e.date)+'</span><div class="m">'+esc(e.t)+'</div>'+clTag(e.c)+e.pill+'</div>';});
+  if(!ev.length)h+='<div class="empty">Sem registos.</div>';
+  return h+'</div></div></div>';
+}
+
+function vPosvenda(){
+  var rd=reviewsDue(),ns=noShows(),we=warrantiesEnding(),ia=inAssist();
+  var h='<div class="ph"><div><h1>Pós-venda</h1><div class="sub">O que precisa de ação '+(S.clinic==='all'?'na rede':'em '+esc(C(S.clinic).name))+', gerado a partir dos aparelhos e da agenda</div></div></div>';
+  function sec(title,note,rows,empty){return '<div class="card"><div class="hd"><h2>'+title+'</h2><span class="note">'+note+'</span></div><div class="bd"><div class="list">'+(rows.length?rows.join(''):'<div class="empty">'+empty+'</div>')+'</div></div></div>';}
+  h+='<div class="grid2">';
+  h+=sec('Revisões por marcar','próximos 30 dias e em atraso',rd.map(function(x){return '<div class="li"><span class="t tnum" style="width:84px">'+F(x.it.date)+'</span><div class="m"><b>'+esc(x.p.name)+'</b><div class="small muted">'+x.it.l+' · '+esc(x.d.brand)+' · <span class="tnum">'+esc(x.p.phone)+'</span></div></div>'+clTag(x.p.clinic)+(x.late?'<span class="pill crit">Em atraso</span>':'')+'<button class="btn sm pri" data-a="plan-book" data-d="'+x.d.id+'" data-i="'+x.i+'">Marcar</button></div>';}),'Nenhuma revisão pendente.');
+  h+=sec('Faltas a recontactar','últimos 30 dias, sem nova marcação',ns.map(function(a){var p=Pt(a.patient);return '<div class="li"><span class="t tnum" style="width:84px">'+F(a.date)+'</span><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">'+TYPES[a.type].l+' · ligar para <span class="tnum">'+esc(p.phone)+'</span></div></div>'+clTag(a.clinic)+'<button class="btn sm pri" data-a="new-appt" data-p="'+p.id+'" data-ty="'+a.type+'">Remarcar</button></div>';}),'Sem faltas por tratar.');
+  h+=sec('Garantias a terminar','próximos 60 dias',we.map(function(d){var p=Pt(d.patient);return '<div class="li"><span class="t tnum" style="width:84px">'+F(d.wEnd)+'</span><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">'+esc(d.brand+' '+d.model+' · '+d.ear)+' · faltam '+diff(TODAY,d.wEnd)+' dias</div></div>'+clTag(p.clinic)+'<button class="btn sm" data-a="open-dev" data-id="'+p.id+'">Ver aparelho</button></div>';}),'Nenhuma garantia a terminar.');
+  h+=sec('Em assistência técnica','aparelhos fora',ia.map(function(d){var p=Pt(d.patient);return '<div class="li"><span class="t tnum" style="width:84px">'+F(d.assist.date)+'</span><div class="m"><b>'+esc(p.name)+'</b><div class="small muted">'+esc(d.brand+' '+d.model)+' · '+esc(d.assist.reason)+' · há '+diff(d.assist.date,TODAY)+' dias</div></div>'+clTag(p.clinic)+'<button class="btn sm" data-a="dev-return" data-id="'+d.id+'">Registar regresso</button></div>';}),'Nenhum aparelho em assistência.');
+  return h+'</div>';
+}
+
+function vEquipa(){
+  var h='<div class="ph"><div><h1>Equipa e rede</h1><div class="sub">Clínicas, utilizadores e acessos · só visível para o gestor da rede</div></div><div class="act"><button class="btn pri" data-a="invite">+ Convidar utilizador</button></div></div>';
+  h+='<div class="chips"><button class="chip" data-a="eq-tab" data-t="users" aria-pressed="'+(S.equipaTab==='users')+'">Utilizadores ('+D.users.length+')</button><button class="chip" data-a="eq-tab" data-t="clinics" aria-pressed="'+(S.equipaTab==='clinics')+'">Clínicas ('+D.clinics.length+')</button></div>';
+  if(S.equipaTab==='clinics'){
+    h+='<div class="grid3">'+D.clinics.map(function(c){return '<div class="card"><div class="hd"><h2>'+esc(c.name)+'</h2></div><div class="bd"><dl class="kv" style="grid-template-columns:110px minmax(0,1fr)"><dt>Registo ERS</dt><dd class="tnum">'+c.ers+'</dd><dt>Morada</dt><dd>'+esc(c.addr)+'</dd><dt>Horário</dt><dd class="tnum">09:00 a 13:00 e 14:00 a 19:00</dd><dt>Equipa</dt><dd>'+staffFor(c.id).map(function(u){return esc(u.name);}).join(', ')+'</dd><dt>Pacientes</dt><dd class="tnum">'+D.patients.filter(function(p){return p.clinic===c.id;}).length+' com esta clínica principal</dd></dl></div></div>';}).join('')+'</div>';
+  }else{
+    h+='<div class="card"><div class="tbl"><table><thead><tr><th>Nome</th><th>Função</th><th>Clínicas</th><th>Email</th><th>Estado</th></tr></thead><tbody>';
+    D.users.forEach(function(u){h+='<tr><td><b>'+esc(u.name)+'</b></td><td>'+ROLES[u.role]+'</td><td>'+(u.role==='gestor'?'<span class="muted">Todas</span>':u.clinics.map(clTag).join(' '))+'</td><td>'+esc(u.email)+'</td><td>'+(u.st==='Ativo'?'<span class="pill good">Ativo</span>':'<span class="pill warn">'+esc(u.st)+'</span>')+'</td></tr>';});
+    h+='</tbody></table></div></div>';
+    h+='<div class="card"><div class="hd"><h2>O que cada perfil vê</h2><span class="note">experimente trocar em "Ver como", no topo</span></div><div class="tbl"><table><thead><tr><th>Perfil</th><th>Faz</th><th>Clínicas</th></tr></thead><tbody><tr><td><b>Gestor da rede</b></td><td>Configura clínicas e utilizadores, vê a visão da rede</td><td>Todas</td></tr><tr><td><b>Audiologista</b></td><td>Audiometrias, aparelhos, revisões, agenda</td><td>As que lhe forem atribuídas</td></tr><tr><td><b>Receção</b></td><td>Marcações, registo de pacientes, anexar documentos. Não altera audiometrias</td><td>A sua clínica</td></tr></tbody></table></div></div>';
+  }
+  return h;
+}
+
+/* ---------- modais ---------- */
+function freeSlots(prof,date,dur,ignore){
+  var out=[];for(var m=540;m+dur<=1140;m+=30){if(m<840&&m+dur>780)continue;var busy=D.appts.some(function(a){return a.id!==ignore&&a.prof===prof&&a.date===date&&a.status!=='faltou'&&tm(a.time)<m+dur&&tm(a.time)+a.dur>m;});if(!busy)out.push(mt(m));}return out;
+}
+function mAppt(){
+  var m=S.modal;var c=m.clinic,type=m.type,dur=TYPES[type].d;
+  var profs=profsOf(c);if(!profs.some(function(u){return u.id===m.prof;}))m.prof=profs[0]?profs[0].id:'';
+  var slots=m.prof?freeSlots(m.prof,m.date,dur):[];if(slots.indexOf(m.time)<0)m.time=slots[0]||'';
+  var pts=D.patients.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt');});
+  var h='<form data-form="appt"><div class="hd"><h2>'+(m.planRef?'Marcar revisão do plano':'Nova marcação')+'</h2><button type="button" class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><div class="fg">';
+  h+='<div class="f full"><label for="m-p">Paciente</label><div style="display:flex;gap:6px"><select id="m-p" required><option value="">Escolher paciente</option>'+pts.map(function(p){return '<option value="'+p.id+'"'+(p.id===m.patient?' selected':'')+'>'+esc(p.name)+' · NIF '+esc(p.nif)+'</option>';}).join('')+'</select><button type="button" class="btn sm" data-a="new-patient-from-appt" title="Registar paciente novo sem sair">+ Novo</button></div></div>';
+  h+='<div class="f"><label for="m-ty">Tipo de consulta</label><select id="m-ty">'+Object.keys(TYPES).map(function(k){return '<option value="'+k+'"'+(k===type?' selected':'')+'>'+TYPES[k].l+' ('+TYPES[k].d+' min)</option>';}).join('')+'</select></div>';
+  h+='<div class="f"><label for="m-c">Clínica</label><select id="m-c">'+allowed().map(function(id){return '<option value="'+id+'"'+(id===c?' selected':'')+'>'+esc(C(id).name)+'</option>';}).join('')+'</select></div>';
+  h+='<div class="f"><label for="m-pr">Profissional</label><select id="m-pr">'+profs.map(function(u){return '<option value="'+u.id+'"'+(u.id===m.prof?' selected':'')+'>'+esc(u.name)+'</option>';}).join('')+'</select></div>';
+  h+='<div class="f"><label for="m-d">Data</label><input type="date" id="m-d" value="'+m.date+'" min="'+TODAY+'"></div>';
+  h+='<div class="f full"><label for="m-t">Hora</label><select id="m-t">'+(slots.length?slots.map(function(s){return '<option'+(s===m.time?' selected':'')+'>'+s+'</option>';}).join(''):'<option value="">Sem vagas neste dia</option>')+'</select><span class="hint">Só aparecem vagas livres deste profissional, em qualquer clínica, dentro do horário de funcionamento.</span></div>';
+  h+='<label class="check full"><input type="checkbox" id="m-r" checked> Enviar lembrete ao paciente 24 horas antes</label>';
+  h+='</div></div><div class="ft"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button class="btn pri" type="submit"'+(slots.length?'':' disabled')+'>Marcar</button></div></form>';
+  return h;
+}
+function mApptView(){
+  var a=D.appts.find(function(x){return x.id===S.modal.id;}),p=Pt(a.patient);
+  var h='<div class="hd"><h2>'+esc(p.name)+'</h2><button class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><dl class="kv"><dt>Quando</dt><dd>'+FL(a.date)+', '+a.time+' ('+a.dur+' min)</dd><dt>Tipo</dt><dd>'+TYPES[a.type].l+'</dd><dt>Profissional</dt><dd>'+esc(U(a.prof).name)+'</dd><dt>Clínica</dt><dd>'+esc(C(a.clinic).name)+'</dd><dt>Telemóvel</dt><dd class="tnum">'+esc(p.phone)+'</dd><dt>Lembrete</dt><dd>'+(a.reminder?'Enviado 24 horas antes':'Sem lembrete')+'</dd><dt>Estado</dt><dd>'+stPill(a.status)+'</dd></dl>';
+  h+='<div><div class="small muted" style="margin-bottom:6px">Mudar estado</div><div class="stbtns">'+Object.keys(STATUS).map(function(k){return '<button class="btn sm'+(k===a.status?' pri':'')+'" data-a="set-status" data-id="'+a.id+'" data-s="'+k+'">'+STATUS[k]+'</button>';}).join('')+'</div></div></div>';
+  h+='<div class="ft"><button class="btn" data-a="open-patient" data-id="'+p.id+'">Abrir ficha</button></div>';
+  return h;
+}
+function mPatient(){
+  var cs=allowed();
+  var h='<form data-form="patient"><div class="hd"><h2>Novo paciente</h2><button type="button" class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><div class="fg">'+
+  '<div class="f full"><label for="n-name">Nome completo</label><input id="n-name" required placeholder="ex.: Maria da Conceição Ferreira"></div>'+
+  '<div class="f"><label for="n-b">Data de nascimento</label><input type="date" id="n-b" required max="'+TODAY+'"></div>'+
+  '<div class="f"><label for="n-nif">NIF</label><input id="n-nif" inputmode="numeric" placeholder="9 dígitos"></div>'+
+  '<div class="f"><label for="n-ph">Telemóvel</label><input id="n-ph" inputmode="tel" required placeholder="9xx xxx xxx"></div>'+
+  '<div class="f"><label for="n-em">Email</label><input id="n-em" type="email"></div>'+
+  '<div class="f"><label for="n-sns">N.º de utente SNS</label><input id="n-sns" inputmode="numeric"></div>'+
+  '<div class="f"><label for="n-sub">Subsistema</label><select id="n-sub">'+SUBS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
+  '<div class="f"><label for="n-subn">N.º de beneficiário</label><input id="n-subn"></div>'+
+  '<div class="f"><label for="n-c">Clínica principal</label><select id="n-c">'+cs.map(function(id){return '<option value="'+id+'"'+(id===(S.clinic==='all'?cs[0]:S.clinic)?' selected':'')+'>'+esc(C(id).name)+'</option>';}).join('')+'</select></div>'+
+  '<div class="f full"><label for="n-o">Como nos conheceu</label><select id="n-o">'+ORIG.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
+  '<label class="check full"><input type="checkbox" id="n-rgpd"> Consentimento RGPD assinado pelo paciente</label>'+
+  '<div class="full hint">O paciente fica visível nas três clínicas da rede.</div>'+
+  '</div></div><div class="ft"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button class="btn pri" type="submit">Guardar paciente</button></div></form>';
+  return h;
+}
+function mDevice(){
+  var p=Pt(S.patient);
+  return '<form data-form="device"><div class="hd"><h2>Registar aparelho</h2><button type="button" class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><div class="small muted">'+esc(p.name)+'</div><div class="fg">'+
+  '<div class="f"><label for="v-b">Marca</label><select id="v-b">'+BRANDS.map(function(b){return '<option>'+b+'</option>';}).join('')+'</select></div>'+
+  '<div class="f"><label for="v-m">Modelo ou formato</label><input id="v-m" value="RIC recarregável" required></div>'+
+  '<div class="f"><label for="v-e">Ouvido</label><select id="v-e"><option>Bilateral</option><option>Direito</option><option>Esquerdo</option></select></div>'+
+  '<div class="f"><label for="v-s">N.º de série</label><input id="v-s" placeholder="D ... · E ..." required></div>'+
+  '<div class="f"><label for="v-f">Data de adaptação</label><input type="date" id="v-f" value="'+TODAY+'" max="'+TODAY+'"></div>'+
+  '<div class="f"><label for="v-w">Garantia</label><select id="v-w"><option value="2">2 anos</option><option value="3" selected>3 anos</option><option value="4">4 anos</option><option value="5">5 anos</option></select></div>'+
+  '</div><div class="hint">Ao guardar, o plano de acompanhamento é criado: revisão aos 15 dias, aos 3 meses, anual, e aviso 60 dias antes do fim da garantia. Os intervalos são sugestões ajustáveis.</div></div><div class="ft"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button class="btn pri" type="submit">Guardar aparelho</button></div></form>';
+}
+function mAssist(){
+  var d=D.devices.find(function(x){return x.id===S.modal.id;});
+  return '<form data-form="assist"><div class="hd"><h2>Enviar para assistência</h2><button type="button" class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><div class="small muted">'+esc(Pt(d.patient).name+' · '+d.brand+' '+d.model)+'</div><div class="fg"><div class="f full"><label for="s-r">Motivo</label><input id="s-r" required placeholder="ex.: ruído no ouvido esquerdo"></div><div class="f"><label for="s-d">Data de envio</label><input type="date" id="s-d" value="'+TODAY+'"></div></div></div><div class="ft"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button class="btn pri" type="submit">Enviar</button></div></form>';
+}
+function mInvite(){
+  return '<form data-form="invite"><div class="hd"><h2>Convidar utilizador</h2><button type="button" class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd"><div class="fg"><div class="f full"><label for="i-n">Nome</label><input id="i-n" required></div><div class="f"><label for="i-e">Email</label><input id="i-e" type="email" required></div><div class="f"><label for="i-r">Função</label><select id="i-r"><option value="audio">Audiologista</option><option value="rececao">Receção</option><option value="gestor">Gestor da rede</option></select></div><div class="f full"><label>Clínicas</label><div class="chips">'+D.clinics.map(function(c){return '<label class="check" style="border:1px solid var(--line);border-radius:20px;padding:4px 10px"><input type="checkbox" name="i-c" value="'+c.id+'"> '+esc(c.name)+'</label>';}).join('')+'</div></div></div><div class="hint">A pessoa recebe um email para criar a palavra-passe. Fica "Convite enviado" até entrar pela primeira vez.</div></div><div class="ft"><button type="button" class="btn ghost" data-a="close">Cancelar</button><button class="btn pri" type="submit">Enviar convite</button></div></form>';
+}
+function mAtt(){
+  var a=D.atts.find(function(x){return x.id===S.modal.id;});var isImg=/\.(png|jpe?g)$/i.test(a.name);
+  var body=a.url&&isImg?'<img class="big" src="'+a.url+'" alt="'+esc(a.name)+'">':'<div class="empty" style="text-align:center;padding:30px 0">Pré-visualização de '+(isImg?'imagens':'PDF')+' disponível na versão final.<br>'+(a.url?'Ficheiro carregado neste navegador.':'Documento de demonstração.')+'</div>';
+  return '<div class="hd"><h2 style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">'+esc(a.name)+'</h2><button class="btn sm ghost" data-a="close">Fechar</button></div><div class="bd">'+body+'<div class="small muted">'+esc(a.type)+' · '+F(a.date)+' · anexado por '+esc(U(a.by).name)+' em '+esc(C(a.clinic).name)+'</div></div>';
+}
+
+/* ---------- render ---------- */
+var NAV=[['inicio','Início'],['agenda','Agenda'],['pacientes','Pacientes'],['posvenda','Pós-venda'],['equipa','Equipa e rede']];
+function render(){
+  var u=me(),cs=allowed();
+  if(S.clinic!=='all'&&cs.indexOf(S.clinic)<0)S.clinic=u.role==='gestor'?'all':cs[0];
+  if(S.clinic==='all'&&u.role!=='gestor')S.clinic=cs[0];
+  if(S.view==='equipa'&&u.role!=='gestor')S.view='inicio';
+  var pend=reviewsDue().length+noShows().length;
+  var h='<div class="proto"><b>Protótipo de demonstração</b><span>Dados fictícios · as alterações não são gravadas</span><button data-a="reset">Repor dados</button></div>';
+  h+='<header class="top"><div class="logo"><i></i>AurisAI <small>Acústica Mais</small></div><span class="sp"></span>';
+  h+='<div class="ctl"><label for="clinicSel">Clínica</label><select id="clinicSel">'+(u.role==='gestor'?'<option value="all"'+(S.clinic==='all'?' selected':'')+'>Todas as clínicas</option>':'')+cs.map(function(id){return '<option value="'+id+'"'+(S.clinic===id?' selected':'')+'>'+esc(C(id).name)+'</option>';}).join('')+'</select></div>';
+  h+='<div class="ctl"><label for="userSel">Ver como</label><select id="userSel">'+['u1','u4','u2','u8'].map(function(id){var x=U(id);return '<option value="'+id+'"'+(S.user===id?' selected':'')+'>'+esc(x.name)+' · '+ROLES[x.role]+'</option>';}).join('')+'</select></div></header>';
+  h+='<div class="body"><nav class="side" aria-label="Menu">'+NAV.filter(function(n){return n[0]!=='equipa'||u.role==='gestor';}).map(function(n){var cur=S.view===n[0]||(n[0]==='pacientes'&&S.view==='ficha');return '<button data-a="nav" data-v="'+n[0]+'" aria-current="'+cur+'">'+n[1]+(n[0]==='posvenda'&&pend?'<span class="n tnum">'+pend+'</span>':'')+'</button>';}).join('')+'<div class="who"><b>'+esc(u.name)+'</b><br>'+ROLES[u.role]+'<br>'+(u.role==='gestor'?'Todas as clínicas':u.clinics.map(function(c){return C(c).short;}).join(', '))+'</div></nav>';
+  h+='<main><div class="wrap">';
+  h+=({inicio:vInicio,agenda:vAgenda,pacientes:vPacientes,ficha:vFicha,posvenda:vPosvenda,equipa:vEquipa}[S.view]||vInicio)();
+  h+='</div></main></div>';
+  if(S.modal){var mm={appt:mAppt,apptView:mApptView,patient:mPatient,device:mDevice,assist:mAssist,invite:mInvite,att:mAtt}[S.modal.k];h+='<div class="ov" data-a="ov"><div class="mod" role="dialog" aria-modal="true">'+mm()+'</div></div>';}
+  if(S.toast)h+='<div class="toast" role="status">'+esc(S.toast)+'</div>';
+  var app=document.getElementById('app');var y=window.scrollY;app.innerHTML=h;window.scrollTo(0,y);
+  bindDrop();
+}
+var tt;function toast(s){S.toast=s;clearTimeout(tt);tt=setTimeout(function(){S.toast=null;render();},2800);}
+
+function openAppt(o){
+  o=o||{};var cs=allowed();var c=o.clinic||(S.clinic==='all'?(S.view==='agenda'?S.agClinic:cs[0]):S.clinic);
+  if(o.patient&&!o.clinic){var p=Pt(o.patient);if(cs.indexOf(p.clinic)>=0&&S.clinic==='all')c=p.clinic;}
+  var u=me();
+  S.modal={k:'appt',patient:o.patient||'',type:o.type||'aval',clinic:c,prof:o.prof||(u.role==='audio'&&u.clinics.indexOf(c)>=0?u.id:''),date:o.date||(S.view==='agenda'?S.date:TODAY),time:o.time||'',planRef:o.planRef||null};
+  render();
+}
+function readAppt(){var m=S.modal;var g=function(id){var e=document.getElementById(id);return e?e.value:'';};m.patient=g('m-p');m.type=g('m-ty');m.clinic=g('m-c');m.prof=g('m-pr');m.date=g('m-d')||TODAY;m.time=g('m-t');}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',function(ev){
+  var el=ev.target.closest('[data-a]');if(!el)return;var a=el.getAttribute('data-a'),ds=el.dataset;
+  if(a==='ov'){if(ev.target===el){S.modal=null;render();}return;}
+  if(a==='nav'){S.view=ds.v;S.modal=null;if(ds.v==='agenda')S.date=TODAY;render();window.scrollTo(0,0);}
+  else if(a==='pick-clinic'){S.clinic=ds.c;render();}
+  else if(a==='open-patient'){S.patient=ds.id;S.view='ficha';S.tab='resumo';S.examSel=null;S.pending=null;S.modal=null;render();window.scrollTo(0,0);}
+  else if(a==='open-dev'){S.patient=ds.id;S.view='ficha';S.tab='aparelhos';S.modal=null;render();window.scrollTo(0,0);}
+  else if(a==='tab'){S.tab=ds.t;S.pending=null;render();}
+  else if(a==='close'){S.modal=null;render();}
+  else if(a==='reset'){D=seed();S={view:'inicio',clinic:'all',user:'u1',patient:null,tab:'resumo',date:TODAY,agClinic:'cacem',search:'',modal:null,examSel:null,compare:true,pending:null,equipaTab:'users'};toast('Dados de demonstração repostos.');render();}
+  else if(a==='new-appt'){openAppt({patient:ds.p,type:ds.ty});}
+  else if(a==='slot'){openAppt({prof:ds.p,time:ds.t,clinic:S.agClinic,date:S.date});}
+  else if(a==='appt'){S.modal={k:'apptView',id:ds.id};render();}
+  else if(a==='set-status'){var ap=D.appts.find(function(x){return x.id===ds.id;});ap.status=ds.s;
+    D.devices.forEach(function(d){d.plan.forEach(function(it){if(it.appt===ap.id){it.status=ds.s==='concluida'?'concluida':ds.s==='faltou'?'por marcar':'marcada';if(ds.s==='faltou')it.appt=null;}});});
+    toast('Estado alterado para '+STATUS[ds.s]+'.');render();}
+  else if(a==='new-patient'){S.modal={k:'patient'};render();}
+  else if(a==='new-patient-from-appt'){readAppt();S.back=S.modal;S.modal={k:'patient'};render();}
+  else if(a==='day'){var n=+ds.n;S.date=n===0?TODAY:addD(S.date,n);render();}
+  else if(a==='ag-clinic'){S.agClinic=ds.c;render();}
+  else if(a==='new-audio'){var p=Pt(S.patient),ex=examsOf(p.id);var existing=ex.find(function(e){return e.date===TODAY;});if(existing){S.examSel=existing.id;toast('Já existe uma audiometria de hoje, aberta para edição.');render();return;}
+    var base=ex[0]||{R:[20,20,20,20,20,20],L:[20,20,20,20,20,20]};var u=me();var e={id:uid('e'),patient:p.id,date:TODAY,type:'Audiometria tonal',by:u.id,clinic:S.clinic==='all'?p.clinic:S.clinic,R:base.R.slice(),L:base.L.slice()};D.exams.push(e);S.examSel=e.id;toast('Nova audiometria de hoje criada a partir da anterior. Ajuste os limiares.');render();}
+  else if(a==='att-save'){var t=document.getElementById('attType').value;var p2=Pt(S.patient);D.atts.push({id:uid('f'),patient:p2.id,name:S.pending.name,type:t,date:TODAY,by:S.user,clinic:S.clinic==='all'?p2.clinic:S.clinic,url:S.pending.url});S.pending=null;toast('Documento anexado à ficha.');render();}
+  else if(a==='att-cancel'){S.pending=null;render();}
+  else if(a==='view-att'){S.modal={k:'att',id:ds.id};render();}
+  else if(a==='new-dev'){S.modal={k:'device'};render();}
+  else if(a==='dev-assist'){S.modal={k:'assist',id:ds.id};render();}
+  else if(a==='dev-return'){var d=D.devices.find(function(x){return x.id===ds.id;});d.status='ativo';d.events.push({date:TODAY,text:'Regressou da assistência ('+d.assist.reason+')'});d.assist=null;toast('Regresso registado. O aparelho volta a "Em uso".');render();}
+  else if(a==='plan-book'){var d2=D.devices.find(function(x){return x.id===ds.d;});var it=d2.plan[+ds.i];var pp=Pt(d2.patient);openAppt({patient:pp.id,type:'rev',clinic:allowed().indexOf(pp.clinic)>=0?pp.clinic:allowed()[0],date:it.date>TODAY?it.date:TODAY,planRef:{d:d2.id,i:+ds.i}});}
+  else if(a==='invite'){S.modal={k:'invite'};render();}
+  else if(a==='eq-tab'){S.equipaTab=ds.t;render();}
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;
+  if(t.id==='clinicSel'){S.clinic=t.value;if(S.clinic!=='all')S.agClinic=S.clinic;render();}
+  else if(t.id==='userSel'){S.user=t.value;var u=me();S.clinic=u.role==='gestor'?'all':u.clinics[0];S.agClinic=S.clinic==='all'?'cacem':S.clinic;S.modal=null;toast('A ver como '+u.name+' ('+ROLES[u.role]+').');render();}
+  else if(t.id==='examSel'){S.examSel=t.value;render();}
+  else if(t.id==='cmp'){S.compare=t.checked;render();}
+  else if(S.modal&&S.modal.k==='appt'&&/^m-(ty|c|pr|d)$/.test(t.id)){readAppt();render();}
+  else if(t.id==='fileIn'&&t.files&&t.files[0]){takeFile(t.files[0]);}
+});
+document.addEventListener('input',function(ev){
+  var t=ev.target;
+  if(t.id==='q'){S.search=t.value;var pos=t.selectionStart;render();var q=document.getElementById('q');if(q){q.focus();try{q.setSelectionRange(pos,pos);}catch(e){}}}
+  else if(t.dataset&&t.dataset.ear){var e=D.exams.find(function(x){return x.id===S.examSel;});var v=parseInt(t.value,10);if(isNaN(v))return;v=Math.max(-10,Math.min(120,v));e[t.dataset.ear][+t.dataset.i]=v;
+    var ex=examsOf(e.patient),prev=ex[ex.indexOf(e)+1];document.getElementById('audioSvg').innerHTML=audiogram(e,S.compare?prev:null);document.getElementById('audioClass').innerHTML=classHTML(e);}
+});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&S.modal){S.modal=null;render();}});
+document.addEventListener('submit',function(ev){
+  ev.preventDefault();var f=ev.target.getAttribute('data-form');var g=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  if(f==='appt'){readAppt();var m=S.modal;if(!m.patient||!m.prof||!m.time){toast('Escolha o paciente, o profissional e uma hora livre.');return;}
+    var ap={id:uid('a'),patient:m.patient,clinic:m.clinic,prof:m.prof,date:m.date,time:m.time,dur:TYPES[m.type].d,type:m.type,status:'marcada',reminder:document.getElementById('m-r').checked};D.appts.push(ap);
+    if(m.planRef){var d=D.devices.find(function(x){return x.id===m.planRef.d;});d.plan[m.planRef.i].status='marcada';d.plan[m.planRef.i].appt=ap.id;}
+    S.modal=null;toast('Marcado: '+Pt(ap.patient).name+', '+F(ap.date)+' às '+ap.time+(ap.reminder?'. Lembrete 24 horas antes.':'.'));render();}
+  else if(f==='patient'){
+    if(!document.getElementById('n-rgpd').checked){toast('Falta o consentimento RGPD assinado. Sem ele não se guarda o paciente.');return;}
+    var p={id:uid('p'),name:g('n-name'),birth:g('n-b'),nif:g('n-nif')||'(sem NIF)',phone:g('n-ph'),email:g('n-em')||'(sem email)',sns:g('n-sns')||'(sem n.º)',sub:g('n-sub'),subNum:g('n-subn'),clinic:g('n-c'),origin:g('n-o'),rgpd:true,created:TODAY};
+    D.patients.push(p);
+    if(S.back){S.modal=S.back;S.back=null;S.modal.patient=p.id;toast('Paciente registado. Continue a marcação.');render();return;}
+    S.modal=null;S.patient=p.id;S.view='ficha';S.tab='resumo';toast('Paciente registado. Já está visível nas três clínicas.');render();window.scrollTo(0,0);}
+  else if(f==='device'){var pt=Pt(S.patient);var fit=g('v-f')||TODAY;var w=addM(fit,12*+g('v-w'));
+    var dv={id:uid('d'),patient:pt.id,brand:g('v-b'),model:g('v-m'),ear:g('v-e'),serials:g('v-s'),fitted:fit,wEnd:w,clinic:S.clinic==='all'?pt.clinic:S.clinic,status:'ativo',assist:null,plan:makePlan(fit,w),events:[{date:fit,text:'Adaptação de '+g('v-b')+' '+g('v-m')}]};
+    D.devices.push(dv);S.modal=null;S.tab='aparelhos';toast('Aparelho registado. Plano criado com '+(dv.plan.length-1)+' revisões e aviso de fim de garantia.');render();}
+  else if(f==='assist'){var d3=D.devices.find(function(x){return x.id===S.modal.id;});d3.status='assistencia';d3.assist={date:g('s-d')||TODAY,reason:g('s-r')};d3.events.push({date:d3.assist.date,text:'Enviado para assistência: '+d3.assist.reason});S.modal=null;toast('Enviado para assistência. Aparece no Pós-venda até regressar.');render();}
+  else if(f==='invite'){var cs=[].slice.call(document.querySelectorAll('input[name="i-c"]:checked')).map(function(x){return x.value;});var r=g('i-r');if(r!=='gestor'&&!cs.length){toast('Escolha pelo menos uma clínica.');return;}
+    D.users.push({id:uid('u'),name:g('i-n'),role:r,clinics:r==='gestor'?D.clinics.map(function(c){return c.id;}):cs,email:g('i-e'),st:'Convite enviado'});S.modal=null;S.equipaTab='users';toast('Convite enviado para '+g('i-e')+'.');render();}
+});
+function takeFile(file){
+  if(!/\.(pdf|png|jpe?g)$/i.test(file.name)){toast('Use um PDF, JPG ou PNG.');return;}
+  var url=null;try{url=URL.createObjectURL(file);}catch(e){}
+  S.pending={name:file.name,url:url};render();
+}
+function bindDrop(){
+  var d=document.getElementById('drop');if(!d)return;
+  ['dragenter','dragover'].forEach(function(n){d.addEventListener(n,function(e){e.preventDefault();d.classList.add('over');});});
+  ['dragleave','drop'].forEach(function(n){d.addEventListener(n,function(e){e.preventDefault();d.classList.remove('over');});});
+  d.addEventListener('drop',function(e){var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)takeFile(f);});
+}
+render();
+})();
+</script>
+</body>
+</html>
